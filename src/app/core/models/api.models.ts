@@ -1,0 +1,90 @@
+export interface AuthResponseDto {
+  accessToken: string;
+  tokenType: string;
+}
+
+export interface User {
+  userName: string;
+  email: string;
+  role: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  contact: string;
+  address: string;
+  phone: string;
+}
+
+export interface Article {
+  id: number;
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  category: Category;
+  supplier: Supplier;
+  barcode: string;
+}
+
+export interface StockEntry {
+  id: number;
+  article: Article;
+  quantity: number;
+  date: string;
+  supplier: Supplier;
+}
+
+export interface StockExit {
+  id: number;
+  article: Article;
+  quantity: number;
+  date: string;
+  destination: string;
+}
+
+export interface Alert {
+  id: number;
+  type: 'LOW_STOCK' | 'SUPPLY_CHAIN_DELAY';
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  status: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED';
+  title: string;
+  content: string;
+  articleId: number;
+  supplierId: number;
+  fingerprint: string;
+  createdAt: string;
+  resolvedAt: string;
+}
+
+export interface Message {
+  id: number;
+  title: string;
+  content: string;
+  createdAt: string;
+  read: boolean;
+}
+
+export interface DashboardStats {
+  numberOfSuppliers: number;
+  numberOfArticles: number;
+  numberOfCategorys: number;
+  outOfStock: number;
+}
+
+export interface StockEntryProgressDto {
+  month: string;
+  totalQuantity: number;
+}
+
+export interface StockExitProgressDto {
+  month: string;
+  totalQuantity: number;
+}

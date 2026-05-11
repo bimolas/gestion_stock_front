@@ -1,0 +1,6 @@
+{
+  "name": "Vanguard Inventory",
+  "description": "A modern, high-performance inventory management dashboard with real-time updates, historical data visualization, user authentication, and RBAC.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
