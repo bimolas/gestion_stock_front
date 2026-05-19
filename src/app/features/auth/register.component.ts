@@ -9,61 +9,106 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-      <h2 class="text-2xl font-medium text-white mb-6">Sign Up</h2>
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
-        
-        <div>
-          <label for="userName" class="block text-sm font-medium text-neutral-300 mb-2">Username</label>
-          <input 
-            id="userName"
-            type="text" 
-            formControlName="userName"
-            class="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-            placeholder="Choose a username"
-          />
+    <div class="min-h-screen bg-[#F9F9F8] flex items-center justify-center p-6">
+      <div class="w-full max-w-md">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-3 mb-12 justify-center">
+          <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary/20">
+            <span class="material-symbols-rounded">grid_view</span>
+          </div>
+          <span class="text-3xl font-display font-extrabold tracking-tighter text-primary">Vanguard</span>
         </div>
 
-        <div>
-          <label for="password" class="block text-sm font-medium text-neutral-300 mb-2">Password</label>
-          <input 
-            id="password"
-            type="password" 
-            formControlName="password"
-            class="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-            placeholder="••••••••"
-          />
+        <!-- Card -->
+        <div class="bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] shadow-xl">
+          <div class="mb-10">
+            <h1 class="text-4xl font-display font-extrabold tracking-tighter text-primary leading-none">Create account</h1>
+            <p class="text-neutral-400 font-medium text-sm mt-3 uppercase tracking-widest">Join your inventory workspace</p>
+          </div>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+            <!-- Username -->
+            <div class="group space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Username</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-rounded absolute left-5 text-neutral-300 group-focus-within:text-primary transition-colors z-10 pointer-events-none">person</span>
+                <input
+                  type="text"
+                  formControlName="userName"
+                  placeholder="Choose a username"
+                  class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl pl-14 pr-5 py-4 font-bold text-primary placeholder:text-neutral-300 placeholder:font-medium focus:outline-none focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/5 transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="group space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">
+                Email <span class="text-neutral-300 normal-case font-medium tracking-normal">(optional)</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-rounded absolute left-5 text-neutral-300 group-focus-within:text-primary transition-colors z-10 pointer-events-none">mail</span>
+                <input
+                  type="email"
+                  formControlName="email"
+                  placeholder="your@email.com"
+                  class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl pl-14 pr-5 py-4 font-bold text-primary placeholder:text-neutral-300 placeholder:font-medium focus:outline-none focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/5 transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="group space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Password</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-rounded absolute left-5 text-neutral-300 group-focus-within:text-primary transition-colors z-10 pointer-events-none">lock</span>
+                <input
+                  [type]="showPassword() ? 'text' : 'password'"
+                  formControlName="password"
+                  placeholder="••••••••"
+                  class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl pl-14 pr-14 py-4 font-bold text-primary placeholder:text-neutral-300 placeholder:font-medium focus:outline-none focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/5 transition-all"
+                />
+                <button type="button" (click)="showPassword.update(v => !v)"
+                  class="absolute right-5 text-neutral-300 hover:text-primary transition-colors z-10">
+                  <span class="material-symbols-rounded text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Error -->
+            @if (error()) {
+              <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium">
+                <span class="material-symbols-rounded text-sm shrink-0">error_outline</span>
+                {{ error() }}
+              </div>
+            }
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              [disabled]="registerForm.invalid || isLoading()"
+              class="w-full py-5 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:bg-neutral-800 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 uppercase tracking-widest mt-2">
+              @if (isLoading()) {
+                <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Creating account...
+              } @else {
+                <span class="material-symbols-rounded">person_add</span>
+                Create Account
+              }
+            </button>
+
+          </form>
         </div>
 
-        <div>
-           <label for="email" class="block text-sm font-medium text-neutral-300 mb-2">Email (Optional)</label>
-           <input 
-             id="email"
-             type="email" 
-             formControlName="email"
-             class="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-             placeholder="your@email.com"
-           />
-        </div>
+        <!-- Footer link -->
+        <p class="text-center text-sm text-neutral-400 font-medium mt-8">
+          Already have an account?
+          <a routerLink="/auth/login" class="font-bold text-primary hover:text-accent transition-colors ml-1">Sign in</a>
+        </p>
 
-        <button 
-          type="submit" 
-          [disabled]="registerForm.invalid || isLoading()"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ isLoading() ? 'Signing up...' : 'Sign Up' }}
-        </button>
-
-        <div class="mt-4 text-center">
-            <span class="text-sm text-neutral-400">Already have an account? </span>
-            <a routerLink="/auth/login" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">Sign in</a>
-        </div>
-
-        @if (error()) {
-        <div class="mt-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
-          {{ error() }}
-        </div>
-        }
-      </form>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -75,24 +120,24 @@ export class RegisterComponent {
 
   registerForm = this.fb.group({
     userName: ['', Validators.required],
-    password: ['', Validators.required],
-    email: ['']
+    email: [''],
+    password: ['', Validators.required]
   });
 
   isLoading = signal(false);
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   onSubmit() {
     if (this.registerForm.valid) {
       this.isLoading.set(true);
       this.error.set(null);
-      
-      this.authService.register(this.registerForm.value as Record<string, string>).subscribe({
-        next: () => {
-          this.router.navigate(['/app/dashboard']);
-        },
-        error: () => {
-          this.error.set('Registration failed. Please try again.');
+      const { userName, email, password } = this.registerForm.value;
+      this.authService.register({ userName: userName!, email: email ?? '', password: password!, role: 'User' }).subscribe({
+        next: () => this.router.navigate(['/app/dashboard']),
+        error: (err) => {
+          const msg = err?.error?.accessToken;
+          this.error.set(msg === 'Username is already taken!' ? 'That username is already taken.' : 'Registration failed. Please try again.');
           this.isLoading.set(false);
         }
       });

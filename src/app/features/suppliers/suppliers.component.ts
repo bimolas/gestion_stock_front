@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@ang
 import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../core/services/inventory.service';
 import { Supplier } from '../../core/models/api.models';
-import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToastService } from '../../core/services/toast.service';
@@ -11,7 +10,7 @@ import gsap from 'gsap';
 @Component({
   selector: 'app-suppliers',
   standalone: true,
-  imports: [CommonModule, MatIconModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="space-y-10 pb-20">
       
@@ -24,7 +23,7 @@ import gsap from 'gsap';
           (click)="showModal.set(true)"
           class="px-8 py-4 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center gap-3 relative overflow-hidden group">
           <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-          <mat-icon class="scale-110">handshake</mat-icon>
+          <span class="material-symbols-rounded">handshake</span>
           <span class="relative">Onboard Supplier</span>
         </button>
       </div>
@@ -62,13 +61,13 @@ import gsap from 'gsap';
                      <td class="px-10 py-8 font-medium text-neutral-600">{{ supplier.contact }}</td>
                      <td class="px-10 py-8">
                         <div class="flex items-center gap-2 font-mono text-xs text-neutral-500">
-                           <mat-icon class="scale-75">phone</mat-icon>
+                           <span class="material-symbols-rounded">phone</span>
                            {{ supplier.phone }}
                         </div>
                      </td>
                      <td class="px-10 py-8">
                         <div class="flex items-center gap-2">
-                           <mat-icon class="scale-75 text-neutral-300">location_on</mat-icon>
+                           <span class="material-symbols-rounded text-neutral-300">location_on</span>
                            <span class="text-sm font-medium text-neutral-500">{{ supplier.address }}</span>
                         </div>
                      </td>
@@ -77,7 +76,7 @@ import gsap from 'gsap';
                    <tr>
                      <td colspan="5" class="px-10 py-32 text-center">
                         <div class="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-200 mb-6 mx-auto">
-                           <mat-icon class="text-4xl">business_center</mat-icon>
+                           <span class="material-symbols-rounded text-4xl">business_center</span>
                         </div>
                         <h3 class="text-lg font-bold text-primary">No suppliers yet</h3>
                         <p class="text-sm text-neutral-400 font-medium mt-1">Start by adding your first business partner.</p>
@@ -100,7 +99,7 @@ import gsap from 'gsap';
                 <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">New Supplier Data</p>
               </div>
               <button (click)="showModal.set(false)" class="w-12 h-12 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-50 rounded-2xl transition-all">
-                <mat-icon>close</mat-icon>
+                <span class="material-symbols-rounded">close</span>
               </button>
             </div>
             <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()" class="p-10 space-y-8">
@@ -191,7 +190,12 @@ export class SuppliersComponent implements OnInit {
   onSubmit() {
     if (this.supplierForm.valid) {
       this.isSubmitting.set(true);
-      this.inventoryService.createSupplier(this.supplierForm.value as Record<string, string>).subscribe({
+      this.inventoryService.createSupplier({
+          name: this.supplierForm.value.name!,
+          contact: this.supplierForm.value.contact!,
+          phone: this.supplierForm.value.phone!,
+          address: this.supplierForm.value.address!
+        }).subscribe({
         next: (created) => {
           this.showModal.set(false);
           this.toastService.success('Supplier Onboarded', `Partner "${created.name}" onboarded successfully.`);

@@ -9,50 +9,90 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
-    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-      <h2 class="text-2xl font-medium text-white mb-6">Sign In</h2>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
-        
-        <div>
-          <label for="userName" class="block text-sm font-medium text-neutral-300 mb-2">Username</label>
-          <input 
-            id="userName"
-            type="text" 
-            formControlName="userName"
-            class="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-            placeholder="Enter your username"
-          />
+    <div class="min-h-screen bg-[#F9F9F8] flex items-center justify-center p-6">
+      <div class="w-full max-w-md">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-3 mb-12 justify-center">
+          <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary/20">
+            <span class="material-symbols-rounded">grid_view</span>
+          </div>
+          <span class="text-3xl font-display font-extrabold tracking-tighter text-primary">Vanguard</span>
         </div>
 
-        <div>
-          <label for="password" class="block text-sm font-medium text-neutral-300 mb-2">Password</label>
-          <input 
-            id="password"
-            type="password" 
-            formControlName="password"
-            class="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
-            placeholder="••••••••"
-          />
+        <!-- Card -->
+        <div class="bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] shadow-xl">
+          <div class="mb-10">
+            <h1 class="text-4xl font-display font-extrabold tracking-tighter text-primary leading-none">Welcome back</h1>
+            <p class="text-neutral-400 font-medium text-sm mt-3 uppercase tracking-widest">Sign in to your workspace</p>
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+            <!-- Username -->
+            <div class="group space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Username</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-rounded absolute left-5 text-neutral-300 group-focus-within:text-primary transition-colors z-10 pointer-events-none">person</span>
+                <input
+                  type="text"
+                  formControlName="userName"
+                  placeholder="Enter your username"
+                  class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl pl-14 pr-5 py-4 font-bold text-primary placeholder:text-neutral-300 placeholder:font-medium focus:outline-none focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/5 transition-all"
+                />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="group space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Password</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-rounded absolute left-5 text-neutral-300 group-focus-within:text-primary transition-colors z-10 pointer-events-none">lock</span>
+                <input
+                  [type]="showPassword() ? 'text' : 'password'"
+                  formControlName="password"
+                  placeholder="••••••••"
+                  class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl pl-14 pr-14 py-4 font-bold text-primary placeholder:text-neutral-300 placeholder:font-medium focus:outline-none focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/5 transition-all"
+                />
+                <button type="button" (click)="showPassword.update(v => !v)"
+                  class="absolute right-5 text-neutral-300 hover:text-primary transition-colors z-10">
+                  <span class="material-symbols-rounded text-lg">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Error -->
+            @if (error()) {
+              <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium">
+                <span class="material-symbols-rounded text-sm shrink-0">error_outline</span>
+                {{ error() }}
+              </div>
+            }
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              [disabled]="loginForm.invalid || isLoading()"
+              class="w-full py-5 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:bg-neutral-800 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3 uppercase tracking-widest mt-2">
+              @if (isLoading()) {
+                <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Signing in...
+              } @else {
+                <span class="material-symbols-rounded">login</span>
+                Sign In
+              }
+            </button>
+
+          </form>
         </div>
 
-        <button 
-          type="submit" 
-          [disabled]="loginForm.invalid || isLoading()"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ isLoading() ? 'Signing in...' : 'Sign In' }}
-        </button>
+        <!-- Footer link -->
+        <p class="text-center text-sm text-neutral-400 font-medium mt-8">
+          No account yet?
+          <a routerLink="/auth/register" class="font-bold text-primary hover:text-accent transition-colors ml-1">Create one</a>
+        </p>
 
-        <div class="mt-4 text-center">
-            <span class="text-sm text-neutral-400">Don't have an account? </span>
-            <a routerLink="/auth/register" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">Sign up</a>
-        </div>
-
-        @if (error()) {
-        <div class="mt-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
-          {{ error() }}
-        </div>
-        }
-      </form>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -63,24 +103,23 @@ export class LoginComponent {
   private router = inject(Router);
 
   loginForm = this.fb.group({
-    userName: ['admin', Validators.required],
-    password: ['password', Validators.required] // Default values for testing based on mock requests
+    userName: ['', Validators.required],
+    password: ['', Validators.required]
   });
 
   isLoading = signal(false);
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   onSubmit() {
     if (this.loginForm.valid) {
       this.isLoading.set(true);
       this.error.set(null);
-      
-      this.authService.login(this.loginForm.value as Record<string, string>).subscribe({
-        next: () => {
-          this.router.navigate(['/app/dashboard']);
-        },
+      const { userName, password } = this.loginForm.value;
+      this.authService.login({ userName: userName!, password: password! }).subscribe({
+        next: () => this.router.navigate(['/app/dashboard']),
         error: () => {
-          this.error.set('Login failed. Please verify credentials.');
+          this.error.set('Invalid username or password.');
           this.isLoading.set(false);
         }
       });

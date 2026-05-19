@@ -3,14 +3,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { InventoryService } from '../../core/services/inventory.service';
 import { StockExit } from '../../core/models/api.models';
-import { MatIconModule } from '@angular/material/icon';
-import { of, catchError, map } from 'rxjs';
+import { of, catchError } from 'rxjs';
 import gsap from 'gsap';
 
 @Component({
   selector: 'app-exit-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterLink],
+  imports: [CommonModule, RouterLink],
   providers: [DatePipe],
   template: `
     <div class="space-y-10 detail-container">
@@ -19,7 +18,7 @@ import gsap from 'gsap';
         <div class="space-y-2">
           <div class="flex items-center gap-4">
             <button routerLink="/app/exits" class="w-10 h-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center text-neutral-400 hover:text-primary transition-all active:scale-95 shadow-sm">
-              <mat-icon>arrow_back</mat-icon>
+              <span class="material-symbols-rounded">arrow_back</span>
             </button>
             <p class="text-neutral-400 font-bold text-[10px] uppercase tracking-[0.3em]">Stock Outbound Dispatch</p>
           </div>
@@ -30,7 +29,7 @@ import gsap from 'gsap';
         
         <div class="flex gap-3">
           <button class="px-6 py-4 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
-            <mat-icon class="scale-90">local_shipping</mat-icon>
+            <span class="material-symbols-rounded">local_shipping</span>
             Track Shipment
           </button>
         </div>
@@ -42,7 +41,7 @@ import gsap from 'gsap';
         <div class="lg:col-span-1 space-y-8">
           <div class="bg-white rounded-[3rem] p-10 shadow-sm animate-item opacity-0 flex flex-col gap-8">
             <div class="w-20 h-20 rounded-[2rem] bg-red-50 text-red-600 flex items-center justify-center shadow-inner">
-              <mat-icon class="text-4xl">local_shipping</mat-icon>
+              <span class="material-symbols-rounded text-4xl">local_shipping</span>
             </div>
             
             <div class="space-y-6">
@@ -61,7 +60,7 @@ import gsap from 'gsap';
               </div>
               <div class="pt-4">
                 <div class="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl w-fit">
-                   <mat-icon class="scale-75">box</mat-icon>
+                   <span class="material-symbols-rounded">box</span>
                    <span class="text-[10px] font-black uppercase tracking-widest">Out for Delivery</span>
                 </div>
               </div>
@@ -77,7 +76,7 @@ import gsap from 'gsap';
               <h4 class="text-xs font-black text-neutral-400 uppercase tracking-widest mb-8">Article Dispatched</h4>
               <div class="flex items-center gap-6">
                 <div class="w-16 h-16 rounded-2xl bg-primary/5 text-primary flex items-center justify-center transition-transform group-hover:scale-110">
-                  <mat-icon class="text-3xl">shopping_bag</mat-icon>
+                  <span class="material-symbols-rounded text-3xl">shopping_bag</span>
                 </div>
                 <div class="flex-1">
                   <h5 class="text-xl font-bold text-primary group-hover:text-accent transition-colors">{{ exit()?.article?.name }}</h5>
@@ -87,7 +86,7 @@ import gsap from 'gsap';
                    <p class="text-sm font-black text-primary">{{ exit()?.article?.barcode }}</p>
                    <p class="text-[10px] font-bold text-neutral-400">SKU/BARCODE</p>
                 </div>
-                <mat-icon class="text-neutral-200 group-hover:text-primary transition-all">arrow_forward</mat-icon>
+                <span class="material-symbols-rounded text-neutral-200 group-hover:text-primary transition-all">arrow_forward</span>
               </div>
             </div>
           </div>
@@ -156,10 +155,9 @@ export class ExitDetailComponent implements OnInit {
   }
 
   private loadExitData(id: number) {
-    this.inventoryService.getAllStockExits().pipe(
-      map(exits => exits.find(e => e.id === id) || null),
+    this.inventoryService.getStockExitById(id).pipe(
       catchError(err => {
-        console.error('Error finding exit:', err);
+        console.error('Error loading exit:', err);
         return of(null);
       })
     ).subscribe(exit => {

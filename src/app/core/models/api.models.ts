@@ -1,7 +1,23 @@
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+export interface LoginDto {
+  userName: string;
+  password: string;
+}
+
+export interface RegisterDto {
+  userName: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
 export interface AuthResponseDto {
   accessToken: string;
   tokenType: string;
 }
+
+// ─── Domain models ───────────────────────────────────────────────────────────
 
 export interface User {
   userName: string;
@@ -87,4 +103,72 @@ export interface StockEntryProgressDto {
 export interface StockExitProgressDto {
   month: string;
   totalQuantity: number;
+}
+
+// ─── Create / Update DTOs ────────────────────────────────────────────────────
+
+export interface CreateArticleDto {
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  categoryId: number;
+  supplierId: number;
+  barcode: string;
+}
+
+export interface UpdateArticleDto {
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+}
+
+export interface CreateCategoryDto {
+  name: string;
+  description: string;
+}
+
+export interface UpdateCategoryDto {
+  name: string;
+  description: string;
+}
+
+export interface CreateSupplierDto {
+  name: string;
+  contact: string;
+  address: string;
+  phone: string;
+}
+
+export interface UpdateSupplierDto {
+  name: string;
+  contact: string;
+  address: string;
+  phone: string;
+}
+
+export interface CreateStockEntryDto {
+  articleId: number;
+  quantity: number;
+  date: string;
+  supplierId: number;
+}
+
+export interface UpdateStockEntryDto {
+  quantity: number;
+  date: string;
+}
+
+export interface CreateStockExitDto {
+  articleId: number;
+  quantity: number;
+  date: string;
+  destination: string;
+}
+
+export interface UpdateStockExitDto {
+  quantity: number;
+  date: string;
+  destination: string;
 }

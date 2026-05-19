@@ -1,7 +1,7 @@
 import { Injectable, inject, OnDestroy } from '@angular/core';
 import { InventoryService } from './inventory.service';
 import { ToastService } from './toast.service';
-import { interval, Subscription, switchMap, catchError, of } from 'rxjs';
+import { interval, Subscription, switchMap, catchError, of, timer } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +17,7 @@ export class AlertMonitorService implements OnDestroy {
     if (this.sub) return;
     
     // Check immediately, then every 30 seconds
-    this.sub = interval(30000).pipe(
-      // prepend a 0-delay fetch so it runs right away on first subscribe
+    this.sub = timer(0, 30000).pipe(
       switchMap(() => this.inventoryService.getOpenAlerts().pipe(
         catchError(() => of([]))
       ))

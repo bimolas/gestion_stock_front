@@ -4,14 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { InventoryService } from '../../core/services/inventory.service';
 import { Category } from '../../core/models/api.models';
-import { MatIconModule } from '@angular/material/icon';
 import { of, catchError } from 'rxjs';
 import gsap from 'gsap';
 
 @Component({
   selector: 'app-category-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="space-y-10 detail-container">
       <!-- Header -->
@@ -19,7 +18,7 @@ import gsap from 'gsap';
         <div class="space-y-2">
           <div class="flex items-center gap-4">
             <button routerLink="/app/categories" class="w-10 h-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center text-neutral-400 hover:text-primary transition-all active:scale-95 shadow-sm">
-              <mat-icon>arrow_back</mat-icon>
+              <span class="material-symbols-rounded">arrow_back</span>
             </button>
             <p class="text-neutral-400 font-bold text-[10px] uppercase tracking-[0.3em]">Category Workspace</p>
           </div>
@@ -37,7 +36,7 @@ import gsap from 'gsap';
             <div class="space-y-6">
               <div class="flex items-center gap-4 border-b border-neutral-50 pb-6">
                 <div class="w-12 h-12 bg-neutral-50 rounded-2xl flex items-center justify-center text-neutral-400">
-                  <mat-icon>info</mat-icon>
+                  <span class="material-symbols-rounded">info</span>
                 </div>
                 <div>
                   <h3 class="text-lg font-bold text-primary">Basic Identity</h3>
@@ -51,7 +50,7 @@ import gsap from 'gsap';
                    Category Name <span class="text-accent">*</span>
                 </label>
                 <div class="relative flex items-center">
-                  <mat-icon class="absolute left-6 text-neutral-300 transition-colors group-focus-within:text-accent z-10">label</mat-icon>
+                  <span class="material-symbols-rounded absolute left-6 text-neutral-300 transition-colors group-focus-within:text-accent z-10">label</span>
                   <input id="categoryName" type="text" formControlName="name" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-3xl pl-16 pr-6 py-5 font-bold text-primary transition-all focus:bg-white focus:shadow-xl focus:shadow-accent/5 focus:border-accent focus:outline-none placeholder:text-neutral-300 placeholder:font-medium" placeholder="e.g. Electronics">
                 </div>
               </div>
@@ -62,7 +61,7 @@ import gsap from 'gsap';
                    Description
                 </label>
                 <div class="relative flex items-start">
-                  <mat-icon class="absolute left-6 top-6 text-neutral-300 transition-colors group-focus-within:text-accent z-10">description</mat-icon>
+                  <span class="material-symbols-rounded absolute left-6 top-6 text-neutral-300 transition-colors group-focus-within:text-accent z-10">description</span>
                   <textarea id="categoryDescription" formControlName="description" rows="3" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-3xl pl-16 pr-6 py-5 font-bold text-primary transition-all focus:bg-white focus:shadow-xl focus:shadow-accent/5 focus:border-accent focus:outline-none placeholder:text-neutral-300 placeholder:font-medium resize-none" placeholder="Enter a brief description..."></textarea>
                 </div>
               </div>
@@ -78,7 +77,7 @@ import gsap from 'gsap';
                @if (isSaving()) {
                  <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                } @else {
-                 <mat-icon class="scale-90">save</mat-icon>
+                 <span class="material-symbols-rounded">save</span>
                }
                {{ isNew() ? 'Create Category' : 'Save Changes' }}
              </button>
@@ -117,19 +116,15 @@ export class CategoryDetailComponent implements OnInit {
   }
 
   private loadCategoryData(id: number) {
-    this.inventoryService.getAllCategories().pipe(
+    this.inventoryService.getCategoryById(id).pipe(
       catchError(err => {
-        console.error('Error fetching categories:', err);
-        return of([]);
+        console.error('Error fetching category:', err);
+        return of(null);
       })
-    ).subscribe(categories => {
-      const cat = categories.find(c => c.id === id);
+    ).subscribe(cat => {
       if (cat) {
         this.category.set(cat);
-        this.categoryForm.patchValue({
-          name: cat.name,
-          description: cat.description
-        });
+        this.categoryForm.patchValue({ name: cat.name, description: cat.description });
         this.animateEntrance();
       }
     });
@@ -142,10 +137,10 @@ export class CategoryDetailComponent implements OnInit {
     }
     
     this.isSaving.set(true);
-    const val = this.categoryForm.value;
+    const { name, description } = this.categoryForm.value;
     
     if (this.isNew()) {
-      this.inventoryService.createCategory(val as Record<string, unknown>).subscribe({
+      this.inventoryService.createCategory({ name: name!, description: description ?? '' }).subscribe({
         next: () => {
           this.isSaving.set(false);
           this.router.navigate(['/app/categories']);
@@ -158,7 +153,7 @@ export class CategoryDetailComponent implements OnInit {
     } else {
       const catId = this.category()?.id;
       if (catId) {
-        this.inventoryService.updateCategory(catId, val as Record<string, unknown>).subscribe({
+        this.inventoryService.updateCategory(catId, { name: name!, description: description ?? '' }).subscribe({
           next: () => {
             this.isSaving.set(false);
             this.router.navigate(['/app/categories']);

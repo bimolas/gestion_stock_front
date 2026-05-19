@@ -1,150 +1,129 @@
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  
   --color-primary: #0a0a0a;
   --color-accent: #3b82f6;
-  
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
 }
 
+/* ── Rendering quality — fixes pixelation on Windows with DPI scaling ────── */
+html {
+  /* Force the browser to use the device pixel ratio correctly */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+* {
+  /* Subpixel rendering for all elements — critical on Windows Chromium */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  /* Prevent blurry borders from subpixel positioning */
+  box-sizing: border-box;
+}
+
+/* ── Material Symbols Rounded ────────────────────────────────────────────── */
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+}
+.material-symbols-rounded.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.sym-sm  { font-size: 16px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+.sym-md  { font-size: 20px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.sym-lg  { font-size: 24px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.sym-xl  { font-size: 32px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40; }
+.sym-2xl { font-size: 40px; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48; }
+
+/* Hide Angular Material icon component — we use sym spans instead */
+mat-icon { display: none !important; }
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
 @layer base {
   body {
     @apply font-sans bg-[#F9F9F8] text-primary antialiased selection:bg-accent/20;
     margin: 0;
     min-height: 100vh;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight font-semibold;
+  h1, h2, h3, h4, h5, h6 { @apply font-display tracking-tight font-semibold; }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
   }
+  input[type="number"] { -moz-appearance: textfield !important; }
 
   select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23171717' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
     background-position: right 1.5rem center !important;
     background-repeat: no-repeat !important;
     background-size: 1.1rem 1.1rem !important;
     padding-right: 4rem !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Hide default number spinners aggressively */
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    margin: 0 !important;
-    display: none !important;
-  }
-  input[type="number"] {
-    -moz-appearance: textfield !important;
-    appearance: none !important;
-  }
-
-  /* Force remove default select styling */
-  select {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23171717' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
-    background-position: right 1.5rem center !important;
-    background-repeat: no-repeat !important;
-    background-size: 1.1rem 1.1rem !important;
-  }
-
-  /* Clear default date/time styling and handle custom icons */
   input[type="date"], input[type="time"], input[type="datetime-local"] {
     appearance: none !important;
     -webkit-appearance: none !important;
     position: relative;
     cursor: pointer;
   }
-
-  /* This selector targets the icon I add in the components */
-  .relative > mat-icon {
-    pointer-events: none;
-    z-index: 20;
-  }
-
   input[type="date"]::-webkit-calendar-picker-indicator,
   input[type="time"]::-webkit-calendar-picker-indicator,
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     background: transparent;
-    bottom: 0;
+    bottom: 0; left: 0; right: 0; top: 0;
+    position: absolute;
+    width: auto; height: auto;
     color: transparent;
     cursor: pointer;
-    height: auto;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: auto;
-    z-index: 30; /* Above everything to catch the click */
+    z-index: 30;
   }
 
-  /* Focus ring override for a cleaner look */
   input:focus, select:focus {
     @apply ring-4 ring-neutral-100 border-primary outline-none transition-all;
     border-color: var(--color-primary) !important;
   }
 }
 
-/* Glassmorphism utility */
-.glass {
-  @apply backdrop-blur-md bg-white/70 border border-white/20 shadow-sm;
-}
+/* ── Depth shadows ───────────────────────────────────────────────────────── */
+.shadow-card       { box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04); }
+.shadow-card-hover { box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04); }
+.shadow-float      { box-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06); }
+.shadow-deep       { box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06); }
 
-/* Magnetic effect transition */
-.magnetic-item {
-  transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
-}
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+.glass { @apply backdrop-blur-md bg-white/80 border border-white/30; }
 
-/* Custom scrollbar utility */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-zinc-200 rounded-full hover:bg-zinc-300 transition-colors;
-}
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 99px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
 
-/* Custom scrollbar global */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
 
-::-webkit-scrollbar-track {
-  background: transparent; 
-}
- 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1); 
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2); 
-}
-
-/* Chart Canvas Reset */
-canvas {
-  max-width: 100% !important;
-}
-
-/* Page transitions placeholders */
-.page-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
+canvas { max-width: 100% !important; }

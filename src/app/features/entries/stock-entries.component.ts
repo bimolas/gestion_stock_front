@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, signal, OnInit, HostListene
 import { CommonModule, DatePipe } from '@angular/common';
 import { InventoryService } from '../../core/services/inventory.service';
 import { StockEntry, Article, Supplier } from '../../core/models/api.models';
-import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToastService } from '../../core/services/toast.service';
@@ -11,7 +10,7 @@ import gsap from 'gsap';
 @Component({
   selector: 'app-stock-entries',
   standalone: true,
-  imports: [CommonModule, MatIconModule, DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, DatePipe, ReactiveFormsModule, RouterLink],
   template: `
     <div class="space-y-10 pb-20">
       
@@ -23,7 +22,7 @@ import gsap from 'gsap';
         
         @if (articles().length === 0 || suppliers().length === 0) {
           <div class="flex items-center gap-3 bg-amber-50 text-amber-700 px-6 py-4 rounded-2xl border border-amber-100">
-            <mat-icon class="text-amber-500">warning</mat-icon>
+            <span class="material-symbols-rounded text-amber-500">warning</span>
             <span class="text-xs font-bold uppercase tracking-wider">Add Articles & Suppliers first</span>
           </div>
         } @else {
@@ -31,7 +30,7 @@ import gsap from 'gsap';
             (click)="showModal.set(true)"
             class="px-8 py-4 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center gap-3 relative overflow-hidden group">
             <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-            <mat-icon class="scale-110">add_shopping_cart</mat-icon>
+            <span class="material-symbols-rounded">add_shopping_cart</span>
             <span class="relative">Register Entry</span>
           </button>
         }
@@ -62,7 +61,7 @@ import gsap from 'gsap';
                      <td class="px-10 py-8">
                         <div class="flex items-center gap-4">
                            <div class="w-10 h-10 rounded-xl bg-neutral-50 flex items-center justify-center text-primary">
-                              <mat-icon class="scale-75">article</mat-icon>
+                              <span class="material-symbols-rounded">article</span>
                            </div>
                            <span class="font-bold text-primary">{{ entry.article.name || 'Unknown' }}</span>
                         </div>
@@ -79,7 +78,7 @@ import gsap from 'gsap';
                    <tr>
                      <td colspan="5" class="px-10 py-32 text-center">
                         <div class="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-200 mb-6 mx-auto">
-                           <mat-icon class="text-4xl">inventory</mat-icon>
+                           <span class="material-symbols-rounded text-4xl">inventory</span>
                         </div>
                         <h3 class="text-lg font-bold text-primary">No entry records</h3>
                         <p class="text-sm text-neutral-400 font-medium mt-1">Incoming stock movements will appear here.</p>
@@ -102,7 +101,7 @@ import gsap from 'gsap';
                 <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Stock Reception</p>
               </div>
               <button (click)="showModal.set(false)" class="w-12 h-12 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-50 rounded-2xl transition-all">
-                <mat-icon>close</mat-icon>
+                <span class="material-symbols-rounded">close</span>
               </button>
             </div>
             <div class="p-10 overflow-y-auto custom-scrollbar">
@@ -115,7 +114,7 @@ import gsap from 'gsap';
                         (click)="toggleDropdown('article', $event)"
                         class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold flex items-center justify-between transition-all hover:bg-white hover:shadow-lg hover:border-accent group/btn active:scale-[0.98]">
                         <span [class.text-neutral-400]="!entryForm.get('articleId')?.value" class="truncate">{{ getSelectedLabel('article') }}</span>
-                        <mat-icon class="text-neutral-400 group-hover/btn:text-accent transition-transform duration-300" [class.rotate-180]="openDropdown() === 'article'">expand_more</mat-icon>
+                        <span class="material-symbols-rounded text-neutral-400" [class.rotate-180]="openDropdown() === 'article'">expand_more</span>
                       </button>
                       
                       @if (openDropdown() === 'article') {
@@ -136,7 +135,7 @@ import gsap from 'gsap';
                                 </div>
                                 @if (isSelected('articleId', a.id)) {
                                   <div class="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center animate-in zoom-in duration-300">
-                                    <mat-icon class="text-[14px] w-auto h-auto text-accent font-bold">check</mat-icon>
+                                    <span class="material-symbols-rounded text-accent" style="font-size:14px">check</span>
                                   </div>
                                 }
                               </button>
@@ -153,7 +152,7 @@ import gsap from 'gsap';
                         (click)="toggleDropdown('supplier', $event)"
                         class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold flex items-center justify-between transition-all hover:bg-white hover:shadow-lg hover:border-accent group/btn active:scale-[0.98]">
                         <span [class.text-neutral-400]="!entryForm.get('supplierId')?.value" class="truncate">{{ getSelectedLabel('supplier') }}</span>
-                        <mat-icon class="text-neutral-400 group-hover/btn:text-accent transition-transform duration-300" [class.rotate-180]="openDropdown() === 'supplier'">expand_more</mat-icon>
+                        <span class="material-symbols-rounded text-neutral-400" [class.rotate-180]="openDropdown() === 'supplier'">expand_more</span>
                       </button>
  
                       @if (openDropdown() === 'supplier') {
@@ -174,7 +173,7 @@ import gsap from 'gsap';
                                 </div>
                                 @if (isSelected('supplierId', s.id)) {
                                   <div class="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center animate-in zoom-in duration-300">
-                                    <mat-icon class="text-[14px] w-auto h-auto text-accent font-bold">check</mat-icon>
+                                    <span class="material-symbols-rounded text-accent" style="font-size:14px">check</span>
                                   </div>
                                 }
                               </button>
@@ -191,18 +190,18 @@ import gsap from 'gsap';
                     <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Reception Quantity</span>
                     <div class="flex items-center bg-[#F9F9F8] border border-neutral-100 rounded-2xl overflow-hidden group focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                       <button type="button" (click)="adjustQuantity(-1)" class="w-14 h-14 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-100 transition-all border-r border-neutral-50 active:scale-95">
-                        <mat-icon class="text-sm">remove</mat-icon>
+                        <span class="material-symbols-rounded text-sm">remove</span>
                       </button>
                       <input type="number" formControlName="quantity" class="w-full bg-transparent border-none px-4 py-4 font-black text-center focus:outline-none">
                       <button type="button" (click)="adjustQuantity(1)" class="w-14 h-14 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-100 transition-all border-l border-neutral-50 active:scale-95">
-                        <mat-icon class="text-sm">add</mat-icon>
+                        <span class="material-symbols-rounded text-sm">add</span>
                       </button>
                     </div>
                   </div>
                   <div class="space-y-2">
                     <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Arrival Timing</span>
                     <div class="relative group">
-                      <mat-icon class="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-400 text-sm z-20 group-focus-within:text-primary transition-colors">schedule</mat-icon>
+                      <span class="material-symbols-rounded absolute left-6 top-1/2 -translate-y-1/2 text-neutral-400 text-sm z-20 group-focus-within:text-primary transition-colors">schedule</span>
                       <input type="datetime-local" formControlName="date" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl pl-14 pr-6 py-4 font-bold text-sm transition-all focus:outline-none">
                     </div>
                   </div>
@@ -217,7 +216,7 @@ import gsap from 'gsap';
                   >
                     @if (isSubmitting()) {
                       <div class="flex items-center justify-center gap-2">
-                        <mat-icon class="animate-spin text-sm">sync</mat-icon>
+                        <span class="material-symbols-rounded animate-spin text-sm">sync</span>
                         <span>Finalizing...</span>
                       </div>
                     } @else {

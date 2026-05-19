@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
 import { InventoryService } from '../../core/services/inventory.service';
 import { Article, Category, Supplier } from '../../core/models/api.models';
 import { RouterLink } from '@angular/router';
@@ -11,7 +10,7 @@ import gsap from 'gsap';
 @Component({
   selector: 'app-articles',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="space-y-8 relative pb-20">
       
@@ -27,7 +26,7 @@ import gsap from 'gsap';
           (click)="showModal.set(true)"
           class="px-8 py-4 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center gap-3 relative overflow-hidden group">
           <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-          <mat-icon class="scale-110">add</mat-icon>
+          <span class="material-symbols-rounded">add</span>
           <span class="relative">Create Article</span>
         </button>
       </div>
@@ -35,7 +34,7 @@ import gsap from 'gsap';
       <!-- Controls -->
       <div class="bg-white p-6 rounded-[2rem] shadow-[0_0_0_1px_rgba(0,0,0,0.03)] flex gap-6 items-center justify-between glass">
         <div class="relative w-full max-w-xl">
-          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">search</mat-icon>
+          <span class="material-symbols-rounded">search</span>
           <input 
             type="text" 
             [formControl]="searchControl"
@@ -45,7 +44,7 @@ import gsap from 'gsap';
         </div>
         <div class="flex gap-3">
           <button class="w-14 h-14 flex items-center justify-center text-neutral-400 border border-neutral-100 rounded-2xl hover:bg-neutral-50 transition-all hover:text-primary">
-            <mat-icon>tune</mat-icon>
+          <span class="material-symbols-rounded">tune</span>
           </button>
         </div>
       </div>
@@ -69,7 +68,7 @@ import gsap from 'gsap';
                   <td class="px-10 py-8">
                     <div class="flex items-center gap-5">
                       <div class="w-14 h-14 rounded-2xl bg-[#F9F9F8] border border-neutral-100 flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform duration-500">
-                        <mat-icon class="text-xl">inventory_2</mat-icon>
+                        <span class="material-symbols-rounded text-xl">inventory_2</span>
                       </div>
                       <div [routerLink]="['/app/articles', article.id]" class="cursor-pointer">
                         <div class="font-bold text-primary group-hover:text-accent transition-colors">{{ article.name }}</div>
@@ -102,7 +101,7 @@ import gsap from 'gsap';
                   <td class="px-10 py-8 text-right">
                     <div class="flex items-center justify-end gap-2 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
                       <button class="w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-white hover:shadow-lg rounded-xl transition-all">
-                        <mat-icon class="text-lg">edit</mat-icon>
+                        <span class="material-symbols-rounded text-lg">edit</span>
                       </button>
                     </div>
                   </td>
@@ -111,7 +110,7 @@ import gsap from 'gsap';
                 <tr>
                   <td colspan="5" class="px-10 py-32 text-center">
                     <div class="w-24 h-24 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-200 mb-6 mx-auto">
-                       <mat-icon class="text-5xl">folder_off</mat-icon>
+                       <span class="material-symbols-rounded text-5xl">folder_off</span>
                     </div>
                     <h3 class="text-lg font-bold text-primary">No results found</h3>
                     <p class="text-sm text-neutral-400 font-medium mt-1">Adjust your search or filter parameters.</p>
@@ -133,7 +132,7 @@ import gsap from 'gsap';
                 <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Product Registration</p>
               </div>
               <button (click)="closeModal()" class="w-12 h-12 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-50 rounded-2xl transition-all">
-                <mat-icon>close</mat-icon>
+                <span class="material-symbols-rounded">close</span>
               </button>
             </div>
             <div class="p-10 overflow-y-auto custom-scrollbar">
@@ -152,7 +151,7 @@ import gsap from 'gsap';
                 <div class="grid md:grid-cols-2 gap-8">
                   <div class="space-y-4 col-span-2 bg-[#F9F9F8] p-6 rounded-2xl border border-neutral-100">
                     <div class="flex items-center gap-3 text-amber-600">
-                      <mat-icon class="text-sm">info</mat-icon>
+                      <span class="material-symbols-rounded">info</span>
                       <span class="text-[10px] font-black uppercase tracking-widest">Procedural Note</span>
                     </div>
                     <p class="text-xs text-neutral-500 font-medium leading-relaxed">
@@ -163,14 +162,14 @@ import gsap from 'gsap';
                     <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Unit Price (Estimated)</span>
                     <div class="flex items-center bg-[#F9F9F8] border border-neutral-100 rounded-2xl overflow-hidden group focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                       <button type="button" (click)="adjustPrice(-10)" class="w-14 h-14 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-100 transition-all border-r border-neutral-50 active:scale-95">
-                        <mat-icon class="text-sm">remove</mat-icon>
+                        <span class="material-symbols-rounded text-sm">remove</span>
                       </button>
                       <div class="flex-1 relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 font-bold">$</span>
                         <input type="number" formControlName="price" class="w-full bg-transparent border-none pl-8 pr-4 py-4 font-black focus:outline-none">
                       </div>
                       <button type="button" (click)="adjustPrice(10)" class="w-14 h-14 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-100 transition-all border-l border-neutral-50 active:scale-95">
-                        <mat-icon class="text-sm">add</mat-icon>
+                        <span class="material-symbols-rounded text-sm">add</span>
                       </button>
                     </div>
                   </div>
@@ -184,7 +183,7 @@ import gsap from 'gsap';
                         (click)="toggleDropdown('category', $event)"
                         class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold flex items-center justify-between transition-all hover:bg-white hover:shadow-lg hover:border-accent group/btn active:scale-[0.98]">
                         <span [class.text-neutral-400]="!articleForm.get('categoryId')?.value" class="truncate">{{ getSelectedLabel('category') }}</span>
-                        <mat-icon class="text-neutral-400 group-hover/btn:text-accent transition-transform duration-300" [class.rotate-180]="openDropdown() === 'category'">expand_more</mat-icon>
+                        <span class="material-symbols-rounded text-neutral-400" [class.rotate-180]="openDropdown() === 'category'">expand_more</span>
                       </button>
                       
                       @if (openDropdown() === 'category') {
@@ -205,7 +204,7 @@ import gsap from 'gsap';
                                 </div>
                                 @if (isSelected('categoryId', c.id)) {
                                   <div class="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center animate-in zoom-in duration-300">
-                                    <mat-icon class="text-[14px] w-auto h-auto text-accent font-bold">check</mat-icon>
+                                    <span class="material-symbols-rounded text-accent" style="font-size:14px">check</span>
                                   </div>
                                 }
                               </button>
@@ -222,7 +221,7 @@ import gsap from 'gsap';
                         (click)="toggleDropdown('supplier', $event)"
                         class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold flex items-center justify-between transition-all hover:bg-white hover:shadow-lg hover:border-accent group/btn active:scale-[0.98]">
                         <span [class.text-neutral-400]="!articleForm.get('supplierId')?.value" class="truncate">{{ getSelectedLabel('supplier') }}</span>
-                        <mat-icon class="text-neutral-400 group-hover/btn:text-accent transition-transform duration-300" [class.rotate-180]="openDropdown() === 'supplier'">expand_more</mat-icon>
+                        <span class="material-symbols-rounded text-neutral-400" [class.rotate-180]="openDropdown() === 'supplier'">expand_more</span>
                       </button>
  
                       @if (openDropdown() === 'supplier') {
@@ -243,7 +242,7 @@ import gsap from 'gsap';
                                 </div>
                                 @if (isSelected('supplierId', s.id)) {
                                   <div class="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center animate-in zoom-in duration-300">
-                                    <mat-icon class="text-[14px] w-auto h-auto text-accent font-bold">check</mat-icon>
+                                    <span class="material-symbols-rounded text-accent" style="font-size:14px">check</span>
                                   </div>
                                 }
                               </button>
@@ -289,9 +288,10 @@ export class ArticlesComponent implements OnInit {
 
   articleForm = this.fb.group({
     name: ['', Validators.required],
+    description: [''],
     barcode: ['', Validators.required],
     price: [0, [Validators.required, Validators.min(0)]],
-    quantity: [0], // Default 0
+    quantity: [0],
     categoryId: ['', Validators.required],
     supplierId: ['', Validators.required]
   });
@@ -400,8 +400,11 @@ export class ArticlesComponent implements OnInit {
       this.isSubmitting.set(true);
       const val = this.articleForm.value;
       const payload = {
-        ...val,
-        quantity: 0, // Explicitly force 0 traceability
+        name: val.name!,
+        description: val.description ?? '',
+        barcode: val.barcode ?? '',
+        price: Number(val.price) || 0,
+        quantity: 0,
         categoryId: Number(val.categoryId),
         supplierId: Number(val.supplierId)
       };

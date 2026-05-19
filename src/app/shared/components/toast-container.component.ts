@@ -1,50 +1,37 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-toast-container',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule],
   template: `
-    <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
-      @for (toast of toastService.toasts(); track toast.id) {
-        <div class="pointer-events-auto flex items-start gap-4 p-4 rounded-2xl shadow-xl border animate-in slide-in-from-right-8 duration-300"
-             [ngClass]="{
-               'bg-white border-emerald-100': toast.type === 'success',
-               'bg-white border-red-100': toast.type === 'error',
-               'bg-white border-amber-100': toast.type === 'warning',
-               'bg-neutral-900 border-neutral-800': toast.type === 'info'
-             }">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-               [ngClass]="{
-                 'bg-emerald-50 text-emerald-500': toast.type === 'success',
-                 'bg-red-50 text-red-500': toast.type === 'error',
-                 'bg-amber-50 text-amber-500': toast.type === 'warning',
-                 'bg-neutral-800 text-white': toast.type === 'info'
-               }">
-               <mat-icon>{{ getIcon(toast.type) }}</mat-icon>
+    <div class="fixed bottom-6 right-6 z-[200] flex flex-col gap-2.5 w-[340px] pointer-events-none">
+      @for (toast of visibleToasts(); track toast.id) {
+        <div class="pointer-events-auto flex items-start gap-3 px-4 py-3.5 rounded-2xl shadow-lg border"
+             [class]="toastClass(toast.type)">
+          <!-- Icon -->
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+               [class]="iconClass(toast.type)">
+            <span class="material-symbols-rounded text-base">{{ getIcon(toast.type) }}</span>
           </div>
-          <div class="flex-1 min-w-0 py-1">
-            <h4 class="text-sm font-bold truncate"
-                [ngClass]="{
-                  'text-emerald-700': toast.type === 'success',
-                  'text-red-700': toast.type === 'error',
-                  'text-amber-700': toast.type === 'warning',
-                  'text-white': toast.type === 'info'
-                }">{{ toast.title }}</h4>
-            <p class="text-xs mt-1 leading-snug"
-               [ngClass]="{
-                  'text-emerald-600': toast.type === 'success',
-                  'text-red-600': toast.type === 'error',
-                  'text-amber-600': toast.type === 'warning',
-                  'text-neutral-400': toast.type === 'info'
-                }">{{ toast.message }}</p>
+          <!-- Text -->
+          <div class="flex-1 min-w-0 py-0.5">
+            <p class="text-sm font-bold leading-tight" [class]="titleClass(toast.type)">{{ toast.title }}</p>
+            <p class="text-xs mt-0.5 leading-snug" [class]="msgClass(toast.type)">{{ toast.message }}</p>
           </div>
-          <button (click)="toastService.remove(toast.id)" class="text-neutral-400 hover:text-neutral-600 transition-colors p-1 flex-shrink-0">
-            <mat-icon class="scale-75">close</mat-icon>
+          <!-- Close -->
+          <button (click)="toastService.remove(toast.id)"
+            class="shrink-0 w-6 h-6 flex items-center justify-center rounded-lg transition-colors mt-0.5"
+            [class]="closeClass(toast.type)">
+            <span class="material-symbols-rounded text-sm">close</span>
           </button>
+        </div>
+      }
+      @if (overflow() > 0) {
+        <div class="pointer-events-auto text-center py-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest bg-white rounded-xl border border-neutral-100 shadow-sm">
+          +{{ overflow() }} more
         </div>
       }
     </div>
@@ -54,13 +41,54 @@ import { ToastService } from '../../core/services/toast.service';
 export class ToastContainerComponent {
   toastService = inject(ToastService);
 
+  private readonly MAX = 3;
+
+  visibleToasts = computed(() => this.toastService.toasts().slice(-this.MAX));
+  overflow = computed(() => Math.max(0, this.toastService.toasts().length - this.MAX));
+
   getIcon(type: string): string {
-    switch (type) {
-      case 'success': return 'check_circle';
-      case 'error': return 'error';
-      case 'warning': return 'warning';
-      case 'info': return 'info';
-      default: return 'info';
-    }
+    return { success: 'check_circle', error: 'error', warning: 'warning', info: 'info' }[type] ?? 'info';
+  }
+
+  toastClass(type: string): string {
+    return {
+      success: 'bg-white border-emerald-200',
+      error:   'bg-white border-red-200',
+      warning: 'bg-white border-amber-200',
+      info:    'bg-primary border-primary',
+    }[type] ?? 'bg-white border-neutral-200';
+  }
+
+  iconClass(type: string): string {
+    return {
+      success: 'bg-emerald-100 text-emerald-600',
+      error:   'bg-red-100 text-red-600',
+      warning: 'bg-amber-100 text-amber-600',
+      info:    'bg-white/10 text-white',
+    }[type] ?? 'bg-neutral-100 text-neutral-500';
+  }
+
+  titleClass(type: string): string {
+    return {
+      success: 'text-neutral-900',
+      error:   'text-neutral-900',
+      warning: 'text-neutral-900',
+      info:    'text-white',
+    }[type] ?? 'text-neutral-900';
+  }
+
+  msgClass(type: string): string {
+    return {
+      success: 'text-neutral-500',
+      error:   'text-neutral-500',
+      warning: 'text-neutral-500',
+      info:    'text-white/70',
+    }[type] ?? 'text-neutral-500';
+  }
+
+  closeClass(type: string): string {
+    return type === 'info'
+      ? 'text-white/50 hover:text-white hover:bg-white/10'
+      : 'text-neutral-300 hover:text-neutral-600 hover:bg-neutral-100';
   }
 }

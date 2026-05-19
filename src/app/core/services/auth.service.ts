@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { AuthResponseDto } from '../models/api.models';
+import { AuthResponseDto, LoginDto, RegisterDto } from '../models/api.models';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -11,12 +11,12 @@ import { Router } from '@angular/router';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  
+
   private tokenKey = 'vanguard_token';
-  
+
   isAuthenticated = signal<boolean>(this.hasToken());
 
-  login(credentials: Record<string, string>) {
+  login(credentials: LoginDto) {
     return this.http.post<AuthResponseDto>(`${environment.apiUrl}/Api/Auth/Login`, credentials).pipe(
       tap(res => {
         if (res.accessToken) {
@@ -27,7 +27,7 @@ export class AuthService {
     );
   }
 
-  register(userData: Record<string, string>) {
+  register(userData: RegisterDto) {
     return this.http.post<AuthResponseDto>(`${environment.apiUrl}/Api/Auth/Register`, userData).pipe(
       tap(res => {
         if (res.accessToken) {

@@ -1,6 +1,5 @@
 import { Component, AfterViewInit, ElementRef, viewChild, viewChildren, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AuthService } from '../../core/services/auth.service';
@@ -9,14 +8,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, MatIconModule],
+  imports: [RouterLink],
   template: `
     <div class="min-h-screen overflow-x-hidden bg-[#F9F9F8]">
       <!-- Header -->
       <header #header class="fixed top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center glass">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-xl">
-            <mat-icon>grid_view</mat-icon>
+            <span class="material-symbols-rounded sym-md">grid_view</span>
           </div>
           <span class="text-2xl font-display font-extrabold tracking-tighter text-primary">Vanguard</span>
         </div>
@@ -67,7 +66,7 @@ gsap.registerPlugin(ScrollTrigger);
               <div class="flex items-center gap-6">
                 <button (click)="scrollToFeatures()" class="group flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-neutral-800 transition-all shadow-2xl hover:shadow-primary/20">
                   Explore Solution
-                  <mat-icon class="group-hover:translate-x-1 transition-transform">arrow_forward</mat-icon>
+                  <span class="material-symbols-rounded sym-md group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </button>
                 <div class="flex -space-x-4">
                   @for (i of [1,2,3,4]; track i) {
@@ -94,7 +93,7 @@ gsap.registerPlugin(ScrollTrigger);
                 <div class="absolute -left-10 bottom-20 bg-white p-6 rounded-2xl shadow-2xl border border-neutral-100 max-w-[200px] animate-bounce-slow">
                   <div class="flex items-center gap-3 mb-2">
                     <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                      <mat-icon class="text-sm">trending_up</mat-icon>
+                      <span class="material-symbols-rounded sym-sm">trending_up</span>
                     </div>
                     <span class="text-xs font-bold text-neutral-400 uppercase">Efficiency</span>
                   </div>
@@ -128,7 +127,7 @@ gsap.registerPlugin(ScrollTrigger);
             @for (feature of features; track feature.title) {
               <div #featureCard class="p-10 rounded-3xl bg-[#F9F9F8] border border-neutral-100 hover:border-accent/40 transition-all hover:shadow-2xl group">
                 <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-accent group-hover:text-white transition-all">
-                  <mat-icon class="text-3xl">{{ feature.icon }}</mat-icon>
+                  <span class="material-symbols-rounded sym-xl">{{ feature.icon }}</span>
                 </div>
                 <h3 class="text-2xl font-bold mb-4 font-display">{{ feature.title }}</h3>
                 <p class="text-neutral-500 font-medium leading-relaxed">{{ feature.desc }}</p>
@@ -154,7 +153,7 @@ gsap.registerPlugin(ScrollTrigger);
               @for (item of aboutItems; track item.title) {
                 <div class="flex gap-6 items-start">
                   <div class="w-12 h-12 rounded-xl bg-accent/10 text-accent flex-shrink-0 flex items-center justify-center">
-                    <mat-icon>{{ item.icon }}</mat-icon>
+                    <span class="material-symbols-rounded sym-md">{{ item.icon }}</span>
                   </div>
                   <div>
                     <h4 class="text-xl font-bold mb-2 font-display">{{ item.title }}</h4>
@@ -191,7 +190,7 @@ gsap.registerPlugin(ScrollTrigger);
           <div>
             <div class="flex items-center gap-2 mb-6">
                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-md">
-                <mat-icon class="text-sm">grid_view</mat-icon>
+                <span class="material-symbols-rounded sym-sm">grid_view</span>
               </div>
               <span class="text-xl font-display font-extrabold tracking-tighter text-primary">Vanguard</span>
             </div>

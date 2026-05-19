@@ -3,14 +3,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { InventoryService } from '../../core/services/inventory.service';
 import { StockEntry } from '../../core/models/api.models';
-import { MatIconModule } from '@angular/material/icon';
-import { of, catchError, map } from 'rxjs';
+import { of, catchError } from 'rxjs';
 import gsap from 'gsap';
 
 @Component({
   selector: 'app-entry-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterLink],
+  imports: [CommonModule, RouterLink],
   providers: [DatePipe],
   template: `
     <div class="space-y-10 detail-container">
@@ -19,7 +18,7 @@ import gsap from 'gsap';
         <div class="space-y-2">
           <div class="flex items-center gap-4">
             <button routerLink="/app/entries" class="w-10 h-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center text-neutral-400 hover:text-primary transition-all active:scale-95 shadow-sm">
-              <mat-icon>arrow_back</mat-icon>
+              <span class="material-symbols-rounded">arrow_back</span>
             </button>
             <p class="text-neutral-400 font-bold text-[10px] uppercase tracking-[0.3em]">Stock Inbound Receipt</p>
           </div>
@@ -30,7 +29,7 @@ import gsap from 'gsap';
         
         <div class="flex gap-3">
           <button class="px-6 py-4 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
-            <mat-icon class="scale-90">print</mat-icon>
+            <span class="material-symbols-rounded">print</span>
             Print Receipt
           </button>
         </div>
@@ -42,7 +41,7 @@ import gsap from 'gsap';
         <div class="lg:col-span-1 space-y-8">
           <div class="bg-white rounded-[3rem] p-10 shadow-sm animate-item opacity-0 flex flex-col gap-8">
             <div class="w-20 h-20 rounded-[2rem] bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
-              <mat-icon class="text-4xl">inventory_2</mat-icon>
+              <span class="material-symbols-rounded text-4xl">inventory_2</span>
             </div>
             
             <div class="space-y-6">
@@ -57,7 +56,7 @@ import gsap from 'gsap';
               </div>
               <div class="pt-4">
                 <div class="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl w-fit">
-                   <mat-icon class="scale-75">verified</mat-icon>
+                   <span class="material-symbols-rounded">verified</span>
                    <span class="text-[10px] font-black uppercase tracking-widest">Entry Confirmed</span>
                 </div>
               </div>
@@ -73,13 +72,13 @@ import gsap from 'gsap';
               <h4 class="text-xs font-black text-neutral-400 uppercase tracking-widest mb-8">Article Received</h4>
               <div class="flex items-center gap-6">
                 <div class="w-16 h-16 rounded-2xl bg-primary/5 text-primary flex items-center justify-center transition-transform group-hover:scale-110">
-                  <mat-icon class="text-3xl">shopping_bag</mat-icon>
+                  <span class="material-symbols-rounded text-3xl">shopping_bag</span>
                 </div>
                 <div class="flex-1">
                   <h5 class="text-xl font-bold text-primary group-hover:text-accent transition-colors">{{ entry()?.article?.name }}</h5>
                   <p class="text-xs text-neutral-400 font-medium">{{ entry()?.article?.category?.name }}</p>
                 </div>
-                <mat-icon class="text-neutral-200 group-hover:text-primary transition-all">arrow_forward</mat-icon>
+                <span class="material-symbols-rounded text-neutral-200 group-hover:text-primary transition-all">arrow_forward</span>
               </div>
             </div>
 
@@ -88,13 +87,13 @@ import gsap from 'gsap';
               <h4 class="text-xs font-black text-neutral-400 uppercase tracking-widest mb-8">Origin Supplier</h4>
               <div class="flex items-center gap-6">
                 <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center transition-transform group-hover:scale-110">
-                  <mat-icon class="text-3xl">business</mat-icon>
+                  <span class="material-symbols-rounded text-3xl">business</span>
                 </div>
                 <div class="flex-1">
                   <h5 class="text-xl font-bold text-primary group-hover:text-accent transition-colors">{{ entry()?.supplier?.name }}</h5>
                   <p class="text-xs text-neutral-400 font-medium">{{ entry()?.supplier?.contact }}</p>
                 </div>
-                <mat-icon class="text-neutral-200 group-hover:text-primary transition-all">arrow_forward</mat-icon>
+                <span class="material-symbols-rounded text-neutral-200 group-hover:text-primary transition-all">arrow_forward</span>
               </div>
             </div>
           </div>
@@ -143,11 +142,9 @@ export class EntryDetailComponent implements OnInit {
   }
 
   private loadEntryData(id: number) {
-    // Attempt direct fetch (hypothetical) first, then fallback to list scan for robustness
-    this.inventoryService.getAllStockEntries().pipe(
-      map(entries => entries.find(e => e.id === id) || null),
+    this.inventoryService.getStockEntryById(id).pipe(
       catchError(err => {
-        console.error('Error finding entry:', err);
+        console.error('Error loading entry:', err);
         return of(null);
       })
     ).subscribe(entry => {

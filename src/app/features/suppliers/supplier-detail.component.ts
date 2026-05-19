@@ -3,15 +3,15 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { InventoryService } from '../../core/services/inventory.service';
 import { Supplier, Article, StockEntry } from '../../core/models/api.models';
-import { MatIconModule } from '@angular/material/icon';
 import { forkJoin, of, catchError, map } from 'rxjs';
 import { ToastService } from '../../core/services/toast.service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import gsap from 'gsap';
 
 @Component({
   selector: 'app-supplier-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterLink],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   providers: [DatePipe],
   template: `
     <div class="space-y-10 detail-container">
@@ -20,7 +20,7 @@ import gsap from 'gsap';
         <div class="space-y-2">
           <div class="flex items-center gap-4">
             <button routerLink="/app/suppliers" class="w-10 h-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center text-neutral-400 hover:text-primary transition-all active:scale-95 shadow-sm">
-              <mat-icon>arrow_back</mat-icon>
+              <span class="material-symbols-rounded">arrow_back</span>
             </button>
             <p class="text-neutral-400 font-bold text-[10px] uppercase tracking-[0.3em]">Supplier Profile</p>
           </div>
@@ -30,8 +30,8 @@ import gsap from 'gsap';
         </div>
         
         <div class="flex gap-3">
-          <button (click)="editSupplier()" class="px-6 py-4 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
-            <mat-icon class="scale-90">edit</mat-icon>
+          <button (click)="showEditModal.set(true)" class="px-6 py-4 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+            <span class="material-symbols-rounded">edit</span>
             Edit Profile
           </button>
         </div>
@@ -42,7 +42,7 @@ import gsap from 'gsap';
         <!-- Profile Card -->
         <div class="lg:col-span-1 bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-8 animate-item opacity-0">
           <div class="w-20 h-20 rounded-[2rem] bg-accent/10 text-accent flex items-center justify-center shadow-inner">
-            <mat-icon class="text-4xl">business</mat-icon>
+            <span class="material-symbols-rounded text-4xl">business</span>
           </div>
           
           <div class="space-y-6">
@@ -63,7 +63,7 @@ import gsap from 'gsap';
           <div class="mt-auto pt-8 border-t border-neutral-50">
             <div class="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
               <div class="flex items-center gap-3">
-                <mat-icon class="text-emerald-500">verified</mat-icon>
+                <span class="material-symbols-rounded text-emerald-500">verified</span>
                 <span class="text-xs font-bold text-primary">Active Partner</span>
               </div>
               <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Since 2024</span>
@@ -78,7 +78,7 @@ import gsap from 'gsap';
             <div class="bg-white rounded-[2.5rem] p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] animate-item opacity-0">
               <div class="flex items-center gap-4 mb-4">
                 <div class="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center">
-                  <mat-icon class="scale-75">inventory_2</mat-icon>
+                  <span class="material-symbols-rounded">inventory_2</span>
                 </div>
                 <h4 class="text-sm font-bold text-primary">Supplied Articles</h4>
               </div>
@@ -88,7 +88,7 @@ import gsap from 'gsap';
             <div class="bg-white rounded-[2.5rem] p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] animate-item opacity-0">
               <div class="flex items-center gap-4 mb-4">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <mat-icon class="scale-75">history</mat-icon>
+                  <span class="material-symbols-rounded">history</span>
                 </div>
                 <h4 class="text-sm font-bold text-primary">Total Deliveries</h4>
               </div>
@@ -116,7 +116,7 @@ import gsap from 'gsap';
                     <div [routerLink]="['/app/articles', article.id]" class="group flex items-center justify-between p-5 rounded-[2rem] hover:bg-neutral-50 transition-all cursor-pointer">
                       <div class="flex items-center gap-5">
                         <div class="w-12 h-12 rounded-2xl bg-white border border-neutral-100 flex items-center justify-center text-primary group-hover:scale-110 group-hover:shadow-lg transition-all">
-                          <mat-icon>shopping_bag</mat-icon>
+                          <span class="material-symbols-rounded">shopping_bag</span>
                         </div>
                         <div>
                           <h5 class="text-sm font-bold text-primary">{{ article.name }}</h5>
@@ -133,7 +133,7 @@ import gsap from 'gsap';
                   } @empty {
                     <div class="text-center py-20">
                       <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-200 mx-auto mb-4">
-                        <mat-icon>inventory</mat-icon>
+                        <span class="material-symbols-rounded">inventory</span>
                       </div>
                       <p class="text-sm text-neutral-400 font-bold">No articles cataloged</p>
                     </div>
@@ -145,7 +145,7 @@ import gsap from 'gsap';
                     <div class="flex items-center justify-between p-5 rounded-[2rem] bg-neutral-20 px-6">
                       <div class="flex items-center gap-5">
                         <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                          <mat-icon class="scale-75">add_shopping_cart</mat-icon>
+                          <span class="material-symbols-rounded">add_shopping_cart</span>
                         </div>
                         <div>
                           <h5 class="text-sm font-bold text-primary">{{ entry.article.name }}</h5>
@@ -160,7 +160,7 @@ import gsap from 'gsap';
                   } @empty {
                     <div class="text-center py-20">
                       <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-200 mx-auto mb-4">
-                        <mat-icon>receipt_long</mat-icon>
+                        <span class="material-symbols-rounded">receipt_long</span>
                       </div>
                       <p class="text-sm text-neutral-400 font-bold">No recent transactions</p>
                     </div>
@@ -172,6 +172,52 @@ import gsap from 'gsap';
         </div>
       </div>
     </div>
+
+    <!-- Edit Modal -->
+    @if (showEditModal()) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-8 bg-black/5 backdrop-blur-md">
+        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-lg border border-neutral-100">
+          <div class="p-10 border-b border-neutral-50 flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-display font-extrabold tracking-tighter">Edit Supplier</h2>
+              <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Update Profile</p>
+            </div>
+            <button (click)="showEditModal.set(false)" class="w-12 h-12 flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-neutral-50 rounded-2xl transition-all">
+              <span class="material-symbols-rounded">close</span>
+            </button>
+          </div>
+          <form [formGroup]="editForm" (ngSubmit)="saveEdit()" class="p-10 space-y-6">
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Name</label>
+              <input type="text" formControlName="name" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold focus:outline-none focus:border-primary transition-all">
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Contact</label>
+                <input type="text" formControlName="contact" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold focus:outline-none focus:border-primary transition-all">
+              </div>
+              <div class="space-y-2">
+                <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Phone</label>
+                <input type="text" formControlName="phone" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold focus:outline-none focus:border-primary transition-all">
+              </div>
+            </div>
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Address</label>
+              <input type="text" formControlName="address" class="w-full bg-[#F9F9F8] border border-neutral-100 rounded-2xl px-6 py-4 font-bold focus:outline-none focus:border-primary transition-all">
+            </div>
+            <div class="flex gap-4 pt-4">
+              <button type="button" (click)="showEditModal.set(false)" class="flex-1 py-4 border border-neutral-100 text-neutral-400 rounded-2xl font-bold hover:bg-neutral-50 transition-all">Cancel</button>
+              <button type="submit" [disabled]="editForm.invalid || isSaving()" class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold shadow-xl shadow-primary/20 hover:bg-neutral-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                @if (isSaving()) {
+                  <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                }
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
   `,
   styleUrls: [],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -181,12 +227,22 @@ export class SupplierDetailComponent implements OnInit {
   private router = inject(Router);
   private inventoryService = inject(InventoryService);
   private toastService = inject(ToastService);
+  private fb = inject(FormBuilder);
   
   supplier = signal<Supplier | null>(null);
   articles = signal<Article[]>([]);
   stockEntries = signal<StockEntry[]>([]);
   activeTab = signal<'articles' | 'history'>('articles');
   isDeleting = signal(false);
+  showEditModal = signal(false);
+  isSaving = signal(false);
+
+  editForm = this.fb.group({
+    name: ['', Validators.required],
+    contact: ['', Validators.required],
+    phone: ['', Validators.required],
+    address: ['', Validators.required]
+  });
 
   filteredArticles = computed(() => {
     const s = this.supplier();
@@ -211,12 +267,12 @@ export class SupplierDetailComponent implements OnInit {
 
   private loadSupplierData(id: number) {
     const supplier$ = this.inventoryService.getSupplierById(id).pipe(
-      catchError(err => {
-        console.warn(`Supplier detail lookup failed for ID ${id}, falling back to full list search.`, err);
-        return this.inventoryService.getAllSuppliers().pipe(
-          map(suppliers => suppliers.find(s => s.id === id) || null)
-        );
-      })
+      catchError(() =>
+        this.inventoryService.getAllSuppliers().pipe(
+          map((suppliers: Supplier[]) => suppliers.find(s => s.id === id) ?? null),
+          catchError(() => of(null))
+        )
+      )
     );
 
     forkJoin({
@@ -225,37 +281,38 @@ export class SupplierDetailComponent implements OnInit {
       entries: this.inventoryService.getAllStockEntries().pipe(catchError(() => of([])))
     }).subscribe(result => {
       if (result.supplier) {
-        this.supplier.set(result.supplier);
+        this.supplier.set(result.supplier as Supplier);
         this.articles.set(result.articles);
         this.stockEntries.set(result.entries);
         this.animateEntrance();
-      } else {
-        console.error('Supplier not found even in full list');
       }
     });
   }
 
   editSupplier() {
-    if (confirm('Are you sure you want to change this supplier?')) {
-      const s = this.supplier();
-      if (!s || !s.id) return;
-      const newName = prompt('Enter new supplier name:', s.name);
-      if (newName !== null && newName.trim() !== '') {
-        this.inventoryService.updateSupplier(s.id, { 
-           ...s,
-           name: newName
-        }).subscribe({
-           next: () => {
-             this.toastService.success('Supplier Updated', 'Supplier profile was updated successfully.');
-             this.loadSupplierData(s.id!);
-           },
-           error: (err) => {
-             console.error(err);
-             this.toastService.error('Update Failed', 'Failed to update the supplier.');
-           }
-        });
+    const s = this.supplier();
+    if (!s) return;
+    this.editForm.patchValue({ name: s.name, contact: s.contact, phone: s.phone, address: s.address });
+    this.showEditModal.set(true);
+  }
+
+  saveEdit() {
+    const s = this.supplier();
+    if (!s || this.editForm.invalid) return;
+    this.isSaving.set(true);
+    const { name, contact, phone, address } = this.editForm.value;
+    this.inventoryService.updateSupplier(s.id, { name: name!, contact: contact!, phone: phone!, address: address! }).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.showEditModal.set(false);
+        this.toastService.success('Supplier Updated', 'Profile updated successfully.');
+        this.loadSupplierData(s.id);
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.toastService.error('Update Failed', 'Could not update supplier.');
       }
-    }
+    });
   }
 
   private animateEntrance() {

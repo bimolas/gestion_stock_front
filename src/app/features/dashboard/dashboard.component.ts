@@ -1,11 +1,10 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, effect, computed, untracked, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { InventoryService } from '../../core/services/inventory.service';
 import { DashboardStats, Alert, Article } from '../../core/models/api.models';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
-import { MatIconModule } from '@angular/material/icon';
 import { forkJoin, of, catchError } from 'rxjs';
 import gsap from 'gsap';
 import jsPDF from 'jspdf';
@@ -14,531 +13,354 @@ import autoTable from 'jspdf-autotable';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, MatIconModule, RouterLink],
+  imports: [CommonModule, BaseChartDirective, RouterLink],
   providers: [DatePipe],
   template: `
-    <div class="space-y-10 dashboard-container">
-      
-      <div class="flex items-center justify-between animate-item opacity-0">
+    <div class="space-y-5">
+
+      <!-- ── Header ─────────────────────────────────────────────────────── -->
+      <div class="flex items-center justify-between di">
         <div>
-          <h1 class="text-4xl font-display font-extrabold tracking-tighter text-primary leading-none">Dashboard</h1>
-          <p class="text-neutral-400 font-medium text-sm mt-2 uppercase tracking-widest">Business Intelligence Suite</p>
+          <h1 class="text-2xl font-display font-extrabold tracking-tight text-primary">Dashboard</h1>
+          <p class="text-neutral-400 text-[10px] mt-0.5 uppercase tracking-widest font-bold">Business Intelligence</p>
         </div>
-        <div class="flex gap-4">
-          <button (click)="downloadReport()" class="px-6 py-3 bg-white border border-neutral-100 text-primary text-sm font-bold rounded-2xl hover:bg-neutral-50 hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-3">
-            <mat-icon class="scale-90">file_download</mat-icon>
-            Export PDF
-          </button>
-        </div>
+        <button (click)="downloadReport()"
+          class="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-neutral-100 text-primary text-xs font-bold rounded-xl shadow-card hover:shadow-card-hover transition-all active:scale-95">
+          <span class="material-symbols-rounded sym-sm">download</span>
+          Export PDF
+        </button>
       </div>
 
-      <!-- Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- ── Stat row ────────────────────────────────────────────────────── -->
+      <div class="flex flex-wrap gap-3 di">
         @if (stats()) {
-          <div routerLink="/app/articles" class="group bg-white rounded-[2.5rem] p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 animate-item opacity-0 transform translate-y-8 relative overflow-hidden cursor-pointer active:scale-95">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-colors"></div>
-            <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-white mb-6 shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform duration-500">
-              <mat-icon class="text-2xl">inventory_2</mat-icon>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1">Total Articles</p>
-              <h3 class="text-4xl font-display font-extrabold text-primary">{{ stats()?.numberOfArticles }}</h3>
-            </div>
-          </div>
-          
-          <div routerLink="/app/categories" class="group bg-white rounded-[2.5rem] p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-accent/5 transition-all duration-500 animate-item opacity-0 transform translate-y-8 relative overflow-hidden cursor-pointer active:scale-95">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-colors"></div>
-            <div class="w-14 h-14 rounded-2xl bg-white border border-neutral-100 flex items-center justify-center text-accent mb-6 shadow-sm group-hover:scale-110 transition-transform duration-500">
-              <mat-icon class="text-2xl">category</mat-icon>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1">Categories</p>
-              <h3 class="text-4xl font-display font-extrabold text-primary">{{ stats()?.numberOfCategorys }}</h3>
-            </div>
-          </div>
-
-          <div routerLink="/app/suppliers" class="group bg-white rounded-[2.5rem] p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 animate-item opacity-0 transform translate-y-8 relative overflow-hidden cursor-pointer active:scale-95">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-neutral-100 rounded-full blur-2xl group-hover:bg-neutral-200 transition-colors"></div>
-            <div class="w-14 h-14 rounded-2xl bg-white border border-neutral-100 flex items-center justify-center text-primary mb-6 shadow-sm group-hover:scale-110 transition-transform duration-500">
-              <mat-icon class="text-2xl">local_shipping</mat-icon>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1">Suppliers</p>
-              <h3 class="text-4xl font-display font-extrabold text-primary">{{ stats()?.numberOfSuppliers }}</h3>
-            </div>
-          </div>
-
-          <div routerLink="/app/alerts" class="group bg-white rounded-[2.5rem] p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-red-500/5 transition-all duration-500 animate-item opacity-0 transform translate-y-8 relative overflow-hidden cursor-pointer active:scale-95">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-50 rounded-full blur-2xl group-hover:bg-red-100 transition-colors"></div>
-            <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-500">
-              <mat-icon class="text-2xl">error_outline</mat-icon>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-red-400 uppercase tracking-widest mb-1">Stock Alerts</p>
-              <h3 class="text-4xl font-display font-extrabold text-primary">{{ stats()?.outOfStock }}</h3>
-            </div>
-          </div>
+          @for (c of statCards(); track c.label) {
+            <a [routerLink]="c.route"
+              class="group bg-white rounded-2xl px-4 py-3 shadow-card hover:shadow-card-hover transition-all cursor-pointer active:scale-[0.97] flex items-center gap-3 min-w-[140px]">
+              <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform" [class]="c.iconBg">
+                <span class="material-symbols-rounded sym-sm" [class]="c.iconColor">{{ c.icon }}</span>
+              </div>
+              <div>
+                <p class="text-[9px] font-black uppercase tracking-widest leading-none" [class]="c.labelColor">{{ c.label }}</p>
+                <p class="text-2xl font-display font-extrabold text-primary leading-tight mt-0.5">{{ c.value }}</p>
+              </div>
+            </a>
+          }
         } @else {
-          <!-- Skeletons -->
           @for (i of [1,2,3,4]; track i) {
-            <div class="bg-white rounded-[2.5rem] p-8 h-48 animate-pulse shadow-sm border border-neutral-50 flex flex-col justify-end">
-              <div class="w-14 h-14 rounded-2xl bg-neutral-50 mb-auto"></div>
-              <div class="h-4 bg-neutral-50 rounded w-24 mb-2"></div>
-              <div class="h-8 bg-neutral-50 rounded w-16"></div>
+            <div class="bg-white rounded-2xl px-4 py-3 min-w-[140px] animate-pulse shadow-card flex items-center gap-3">
+              <div class="w-8 h-8 rounded-xl bg-neutral-50 shrink-0"></div>
+              <div><div class="h-2 bg-neutral-50 rounded w-14 mb-2"></div><div class="h-5 bg-neutral-50 rounded w-8"></div></div>
             </div>
           }
         }
       </div>
 
-      <!-- Low Stock Alerts Summary Section -->
-      <div 
-        class="border rounded-[2.5rem] p-6 flex flex-col md:flex-row items-center justify-between gap-6 animate-item opacity-0 transform translate-y-4"
-        [class.bg-red-50]="lowStockCount() > 0"
-        [class.border-red-100]="lowStockCount() > 0"
-        [class.bg-emerald-50]="lowStockCount() === 0"
-        [class.border-emerald-100]="lowStockCount() === 0">
-        
-        <div class="flex items-center gap-6">
-          <div 
-            class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm shrink-0"
-            [class.text-red-500]="lowStockCount() > 0"
-            [class.text-emerald-500]="lowStockCount() === 0">
-            <mat-icon>{{ lowStockCount() > 0 ? 'warning' : 'check_circle' }}</mat-icon>
+      <!-- ── Stock health banner ─────────────────────────────────────────── -->
+      @if (stats()) {
+        <div class="rounded-xl px-4 py-3 flex items-center justify-between gap-4 di"
+          [class]="lowStockCount() > 0 ? 'bg-red-50 border border-red-100' : 'bg-emerald-50 border border-emerald-100'">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-rounded sym-sm filled" [class]="lowStockCount() > 0 ? 'text-red-500' : 'text-emerald-500'">
+              {{ lowStockCount() > 0 ? 'warning' : 'check_circle' }}
+            </span>
+            <p class="text-xs font-bold text-primary">
+              @if (lowStockCount() > 0) {
+                <span class="text-red-600">{{ lowStockCount() }}</span> articles running low on stock
+              } @else {
+                All stock levels are healthy
+              }
+            </p>
           </div>
-          <div>
-            <h3 class="text-xl font-display font-extrabold text-primary">Low Stock Summary</h3>
-            @if (lowStockCount() > 0) {
-              <p class="text-sm text-neutral-500 mt-1 flex flex-wrap items-center gap-1">
-                There are currently <span class="font-bold text-red-500 bg-red-100/50 px-2 py-0.5 rounded-lg">{{ lowStockCount() }}</span> articles running low on inventory.
-              </p>
-            } @else {
-              <p class="text-sm text-neutral-500 mt-1">All articles have sufficient stock levels.</p>
-            }
-          </div>
+          <a routerLink="/app/alerts"
+            class="shrink-0 px-3 py-1 text-white text-[10px] font-bold rounded-lg flex items-center gap-1 transition-all hover:opacity-90"
+            [class]="lowStockCount() > 0 ? 'bg-red-500' : 'bg-emerald-500'">
+            View <span class="material-symbols-rounded sym-sm">arrow_forward</span>
+          </a>
         </div>
-        
-        <a routerLink="/app/alerts" 
-          class="px-6 py-3 text-white rounded-xl text-sm font-bold shadow-lg hover:scale-105 active:scale-95 transition-all whitespace-nowrap shrink-0 flex items-center gap-2"
-          [class.bg-red-500]="lowStockCount() > 0"
-          [class.shadow-red-500/20]="lowStockCount() > 0"
-          [class.bg-emerald-500]="lowStockCount() === 0"
-          [class.shadow-emerald-500/20]="lowStockCount() === 0">
-          View Alerts <mat-icon class="scale-75">arrow_forward</mat-icon>
-        </a>
-      </div>
+      }
 
-      <!-- Charts & Alerts Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-item opacity-0">
-        <!-- Main Chart -->
-        <div class="lg:col-span-2 bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col">
-          <div class="mb-10 flex justify-between items-end">
+      <!-- ── Main row: chart + alerts ────────────────────────────────────── -->
+      <div class="grid grid-cols-3 gap-5 di">
+
+        <!-- Inventory Flow — takes 2/3 width -->
+        <div class="col-span-2 bg-white rounded-2xl p-5 shadow-card flex flex-col">
+          <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-2xl font-display font-extrabold tracking-tight text-primary">Inventory Flow</h2>
-              <p class="text-neutral-400 text-xs font-bold uppercase tracking-widest mt-1">Real-time Movement Analytics</p>
+              <h2 class="text-sm font-display font-extrabold text-primary">Inventory Flow</h2>
+              <p class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 mt-0.5">Monthly stock movements</p>
             </div>
-            <div class="flex items-center gap-4 bg-neutral-50 p-1.5 rounded-2xl">
-              <button class="px-4 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-primary transition-all">Yearly</button>
-              <button class="px-4 py-2 text-xs font-bold rounded-xl text-neutral-400 hover:text-primary transition-all">Monthly</button>
+            <div class="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-neutral-400">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary inline-block"></span>Inbound</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-accent inline-block"></span>Outbound</span>
             </div>
           </div>
-          <div class="flex-1 w-full h-[400px]">
+          <div class="flex-1" style="height:220px; position:relative;">
             @if (lineChartData()) {
-              <canvas baseChart #chartCanvas
-                [data]="lineChartData()!" 
-                [options]="lineChartOptions" 
-                [type]="'line'">
-              </canvas>
+              <canvas baseChart [data]="lineChartData()!" [options]="lineChartOptions" type="line" style="width:100%;height:100%;"></canvas>
+            } @else {
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-5 h-5 border-2 border-neutral-100 border-t-primary rounded-full animate-spin"></div>
+              </div>
             }
           </div>
         </div>
 
-        <!-- Recent Alerts -->
-        <div class="bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col h-[550px]">
-          <div class="flex items-center justify-between mb-8">
+        <!-- Open Alerts — takes 1/3 width -->
+        <div class="bg-white rounded-2xl p-5 shadow-card flex flex-col">
+          <div class="flex items-center justify-between mb-3">
             <div>
-              <h2 class="text-2xl font-display font-extrabold tracking-tight text-primary">Open Alerts</h2>
-              <p class="text-neutral-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Critical Priority</p>
+              <h2 class="text-sm font-display font-extrabold text-primary">Open Alerts</h2>
+              <p class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 mt-0.5">Requires attention</p>
             </div>
-            <span class="w-8 h-8 rounded-full bg-red-50 text-red-500 text-[10px] font-black flex items-center justify-center">{{ alerts().length }}</span>
+            @if (alerts().length > 0) {
+              <span class="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center">{{ alerts().length }}</span>
+            }
           </div>
-          
-          <div class="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+
+          <div class="flex-1 overflow-y-auto custom-scrollbar space-y-1" style="max-height:200px;">
             @for (alert of alerts(); track alert.id) {
-              <div [routerLink]="['/app/alerts', alert.id]" class="flex gap-5 alert-card group cursor-pointer animate-item opacity-0">
-                <div [class]="'w-12 h-12 rounded-2xl flex shrink-0 items-center justify-center transition-all group-hover:scale-110 ' + getAlertColor(alert.severity)">
-                  <mat-icon class="scale-90">
-                    {{ alert.type === 'LOW_STOCK' ? 'inventory_2' : 'priority_high' }}
-                  </mat-icon>
+              <a [routerLink]="['/app/alerts', alert.id]"
+                class="group flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-neutral-50 transition-colors cursor-pointer">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" [class]="alertIconClass(alert.severity)">
+                  <span class="material-symbols-rounded sym-sm">{{ alert.type === 'LOW_STOCK' ? 'inventory_2' : 'link_off' }}</span>
                 </div>
-                <div class="flex-1 min-w-0 border-b border-neutral-50 pb-6 group-last:border-none">
-                  <div class="flex justify-between items-start mb-1">
-                    <h4 class="text-sm font-bold text-primary truncate pr-2 group-hover:text-accent transition-colors">{{ alert.title }}</h4>
-                  </div>
-                  <p class="text-xs text-neutral-400 font-medium leading-relaxed line-clamp-2">{{ alert.content }}</p>
-                  <div class="mt-4 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
-                    <button (click)="resolveAlert(alert.id, $event)" class="px-4 py-2 bg-primary text-white text-[10px] font-bold rounded-xl hover:bg-neutral-800 transition-colors uppercase tracking-widest">Mark Resolved</button>
-                  </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-[11px] font-bold text-primary truncate group-hover:text-accent transition-colors">{{ alert.title }}</p>
+                  <p class="text-[10px] text-neutral-400 mt-0.5 line-clamp-1 leading-snug">{{ alert.content }}</p>
                 </div>
-              </div>
+              </a>
             } @empty {
-              <div class="flex flex-col items-center justify-center text-center py-20">
-                <div class="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-200 mb-6 group">
-                   <mat-icon class="text-4xl group-hover:rotate-12 transition-transform">verified</mat-icon>
+              <div class="flex flex-col items-center justify-center py-8 text-center">
+                <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center mb-2">
+                  <span class="material-symbols-rounded sym-md text-emerald-500 filled">verified</span>
                 </div>
-                <h5 class="text-sm font-bold text-primary">All Clear!</h5>
-                <p class="text-xs text-neutral-400 mt-2 font-medium">No inventory discrepancies found.</p>
+                <p class="text-xs font-bold text-primary">All clear</p>
+                <p class="text-[10px] text-neutral-400 mt-0.5">No open alerts</p>
+              </div>
+            }
+          </div>
+
+          @if (alerts().length > 0) {
+            <a routerLink="/app/alerts"
+              class="mt-3 pt-3 border-t border-neutral-50 flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-widest text-neutral-400 hover:text-primary transition-colors">
+              View all <span class="material-symbols-rounded sym-sm">arrow_forward</span>
+            </a>
+          }
+        </div>
+      </div>
+
+      <!-- ── Bottom row: doughnut + bar ─────────────────────────────────── -->
+      <div class="grid grid-cols-2 gap-5 di">
+
+        <!-- Category doughnut -->
+        <div class="bg-white rounded-2xl p-5 shadow-card">
+          <h2 class="text-sm font-display font-extrabold text-primary">Stock by Category</h2>
+          <p class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 mt-0.5 mb-4">Article distribution</p>
+          <!-- overflow-hidden clips the hover expansion -->
+          <div style="height:200px; position:relative; overflow:hidden;">
+            @if (doughnutChartData()) {
+              <canvas baseChart [data]="doughnutChartData()!" [options]="doughnutChartOptions" type="doughnut" style="width:100%;height:100%;"></canvas>
+            } @else {
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-5 h-5 border-2 border-neutral-100 border-t-primary rounded-full animate-spin"></div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Top articles bar -->
+        <div class="bg-white rounded-2xl p-5 shadow-card">
+          <h2 class="text-sm font-display font-extrabold text-primary">Top Articles</h2>
+          <p class="text-[9px] font-bold uppercase tracking-widest text-neutral-400 mt-0.5 mb-4">By stock quantity</p>
+          <div style="height:200px; position:relative;">
+            @if (barChartData()) {
+              <canvas baseChart [data]="barChartData()!" [options]="barChartOptions" type="bar" style="width:100%;height:100%;"></canvas>
+            } @else {
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-5 h-5 border-2 border-neutral-100 border-t-primary rounded-full animate-spin"></div>
               </div>
             }
           </div>
         </div>
       </div>
 
-      <!-- Secondary Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-item opacity-0">
-        <!-- Category Distribution -->
-        <div class="bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col">
-          <h2 class="text-2xl font-display font-extrabold tracking-tight text-primary mb-2">Stock by Category</h2>
-          <p class="text-neutral-400 text-xs font-bold uppercase tracking-widest mb-8">Article Distribution Across Units</p>
-          <div class="flex-1 h-[300px]">
-            @if (doughnutChartData()) {
-              <canvas baseChart 
-                [data]="doughnutChartData()!" 
-                [options]="doughnutChartOptions" 
-                [type]="'doughnut'">
-              </canvas>
-            }
-          </div>
-        </div>
-
-        <!-- Top Articles -->
-        <div class="bg-white rounded-[3rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col">
-          <h2 class="text-2xl font-display font-extrabold tracking-tight text-primary mb-2">Top Stock Articles</h2>
-          <p class="text-neutral-400 text-xs font-bold uppercase tracking-widest mb-8">Highest Quantity Items in Inventory</p>
-          <div class="flex-1 h-[300px]">
-            @if (barChartData()) {
-              <canvas baseChart 
-                [data]="barChartData()!" 
-                [options]="barChartOptions" 
-                [type]="'bar'">
-              </canvas>
-            }
-          </div>
-        </div>
-      </div>
     </div>
   `,
+  styles: [`
+    .di { opacity: 0; transform: translateY(12px); }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
   private inventoryService = inject(InventoryService);
   private datePipe = inject(DatePipe);
+  private cd = inject(ChangeDetectorRef);
 
   stats = signal<DashboardStats | null>(null);
   alerts = signal<Alert[]>([]);
   articles = signal<Article[]>([]);
-  lowStockCount = computed(() => this.alerts().filter(alert => alert.type === 'LOW_STOCK').length);
-  
+  lowStockCount = computed(() => this.alerts().filter(a => a.type === 'LOW_STOCK').length);
+
   lineChartData = signal<ChartConfiguration<'line'>['data'] | null>(null);
   doughnutChartData = signal<ChartConfiguration<'doughnut'>['data'] | null>(null);
   barChartData = signal<ChartConfiguration<'bar'>['data'] | null>(null);
 
-  public lineChartOptions: ChartConfiguration<'line'>['options'] = {
+  statCards = computed(() => {
+    const s = this.stats();
+    if (!s) return [];
+    return [
+      { label: 'Articles',   value: s.numberOfArticles,  icon: 'inventory_2',    route: '/app/articles',   iconBg: 'bg-primary',     iconColor: 'text-white',       labelColor: 'text-neutral-400' },
+      { label: 'Categories', value: s.numberOfCategorys, icon: 'category',       route: '/app/categories', iconBg: 'bg-blue-50',     iconColor: 'text-accent',      labelColor: 'text-neutral-400' },
+      { label: 'Suppliers',  value: s.numberOfSuppliers, icon: 'local_shipping', route: '/app/suppliers',  iconBg: 'bg-neutral-100', iconColor: 'text-neutral-600', labelColor: 'text-neutral-400' },
+      { label: 'Low Stock',  value: s.outOfStock,        icon: 'warning',        route: '/app/alerts',     iconBg: 'bg-red-50',      iconColor: 'text-red-500',     labelColor: 'text-red-400' },
+    ];
+  });
+
+  lineChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: true, position: 'top' },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        titleColor: '#171717',
-        bodyColor: '#525252',
-        borderColor: '#e5e5e5',
-        borderWidth: 1,
-        padding: 12,
-        boxPadding: 6
-      }
+      legend: { display: false },
+      tooltip: { mode: 'index', intersect: false, backgroundColor: '#fff', titleColor: '#0a0a0a', bodyColor: '#737373', borderColor: '#e5e5e5', borderWidth: 1, padding: 10, cornerRadius: 10, boxPadding: 4 }
     },
     scales: {
-      y: { border: { display: false }, grid: { color: '#f5f5f5' } },
-      x: { grid: { display: false } }
+      y: { border: { display: false }, grid: { color: '#f5f5f5' }, ticks: { padding: 8, font: { size: 11, family: 'Inter' }, color: '#a3a3a3' } },
+      x: { grid: { display: false }, border: { display: false }, ticks: { padding: 8, font: { size: 11, family: 'Inter' }, color: '#a3a3a3' } }
     },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    },
-    elements: {
-      line: { tension: 0.4 },
-      point: { radius: 0, hitRadius: 10, hoverRadius: 6 }
-    }
+    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+    elements: { line: { tension: 0.4, borderWidth: 2 }, point: { radius: 3, hitRadius: 10, hoverRadius: 5, borderWidth: 2, borderColor: '#fff' } }
   };
 
-  public doughnutChartOptions: ChartConfiguration<'doughnut'>['options'] = {
+  doughnutChartOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    cutout: '65%',
     plugins: {
-      legend: { position: 'right' }
-    }
+      legend: { position: 'right', labels: { usePointStyle: true, pointStyle: 'circle', padding: 10, font: { size: 11, family: 'Inter' }, color: '#737373' } },
+      tooltip: { backgroundColor: '#fff', titleColor: '#0a0a0a', bodyColor: '#737373', borderColor: '#e5e5e5', borderWidth: 1, padding: 10, cornerRadius: 10 }
+    },
+    // hoverOffset 0 prevents segments from expanding outside the canvas
+    animation: { animateRotate: true, animateScale: false }
   };
 
-  public barChartOptions: ChartConfiguration<'bar'>['options'] = {
+  barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
     indexAxis: 'y',
     plugins: {
-      legend: { display: false }
+      legend: { display: false },
+      tooltip: { backgroundColor: '#fff', titleColor: '#0a0a0a', bodyColor: '#737373', borderColor: '#e5e5e5', borderWidth: 1, padding: 10, cornerRadius: 10 }
     },
     scales: {
-      x: { grid: { display: false } },
-      y: { grid: { display: false } }
+      x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 11, family: 'Inter' }, color: '#a3a3a3', padding: 4 } },
+      y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 11, family: 'Inter' }, color: '#525252', padding: 4 } }
     }
   };
 
-  private cd = inject(ChangeDetectorRef);
-
-  constructor() {
-    effect(() => {
-      // Trigger whenever core data updates
-      this.stats();
-      this.alerts();
-      this.lineChartData();
-      
-      untracked(() => {
-        this.animateEntrance();
-      });
-    });
-  }
-
-  ngOnInit() {
-    this.fetchData();
-  }
+  ngOnInit() { this.fetchData(); }
 
   resolveAlert(id: number, event?: Event) {
     if (event) event.stopPropagation();
-    this.inventoryService.resolveAlert(id).subscribe({
-      next: () => {
-        this.alerts.update(alerts => alerts.filter(a => a.id !== id));
-      },
-      error: (err) => console.error('Error resolving alert:', err)
-    });
+    this.inventoryService.resolveAlert(id).subscribe({ next: () => this.alerts.update(a => a.filter(x => x.id !== id)) });
+  }
+
+  alertIconClass(s: string): string {
+    return ({ CRITICAL: 'bg-red-50 text-red-500', HIGH: 'bg-orange-50 text-orange-500', MEDIUM: 'bg-amber-50 text-amber-600', LOW: 'bg-blue-50 text-blue-500' } as Record<string,string>)[s] ?? 'bg-neutral-50 text-neutral-400';
   }
 
   downloadReport() {
     const doc = new jsPDF();
-    const currentDate = this.datePipe.transform(new Date(), 'longDate');
-    
-    // Add title
-    doc.setFontSize(22);
-    doc.setTextColor(40, 40, 40);
-    doc.text('Vanguard Inventory OS', 14, 22);
-    
-    // Add subtitle
-    doc.setFontSize(11);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Generated on: ${currentDate}`, 14, 30);
-    doc.text(`Role: Administrator`, 14, 36);
-
-    // Add Stats Overview
-    doc.setFontSize(16);
-    doc.setTextColor(60, 60, 60);
-    doc.text('Dashboard Overview', 14, 50);
-
+    const date = this.datePipe.transform(new Date(), 'longDate');
+    doc.setFontSize(18); doc.setTextColor(40, 40, 40); doc.text('Vanguard Inventory OS', 14, 22);
+    doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.text(`Generated: ${date}`, 14, 30);
     const s = this.stats();
     if (s) {
-      autoTable(doc, {
-        startY: 55,
-        head: [['Metric', 'Count']],
-        body: [
-          ['Total Articles', s.numberOfArticles.toString()],
-          ['Categories', s.numberOfCategorys.toString()],
-          ['Suppliers', s.numberOfSuppliers.toString()],
-          ['Out of Stock', s.outOfStock.toString()]
-        ],
-        theme: 'striped',
-        headStyles: { fillColor: [79, 70, 229] }
-      });
+      autoTable(doc, { startY: 40, head: [['Metric', 'Value']], body: [['Articles', s.numberOfArticles.toString()], ['Categories', s.numberOfCategorys.toString()], ['Suppliers', s.numberOfSuppliers.toString()], ['Low Stock', s.outOfStock.toString()]], theme: 'striped', headStyles: { fillColor: [10, 10, 10] } });
     }
-
-    // Add Open Alerts
-    const openAlerts = this.alerts();
-    const finalY = (doc as any).lastAutoTable?.finalY || 60;
-    
-    if (openAlerts.length > 0) {
-      doc.setFontSize(16);
-      doc.text('Active Alerts', 14, finalY + 20);
-      
-      const body = openAlerts.map(a => [
-        a.severity,
-        a.type.replace('_', ' '),
-        a.title,
-        a.content
-      ]);
-
-      autoTable(doc, {
-        startY: finalY + 25,
-        head: [['Severity', 'Type', 'Title', 'Details']],
-        body: body,
-        theme: 'plain',
-        headStyles: { textColor: [220, 38, 38] },
-        styles: { cellWidth: 'wrap' },
-        columnStyles: { 3: { cellWidth: 80 } } // Give details more space
-      });
-    }
-
-    doc.save('Vanguard-Inventory-Report.pdf');
-  }
-
-  getAlertColor(severity: string) {
-    switch (severity) {
-      case 'CRITICAL': return 'bg-red-100 text-red-600';
-      case 'HIGH': return 'bg-orange-100 text-orange-600';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-600';
-      default: return 'bg-blue-100 text-blue-600';
-    }
+    doc.save('Vanguard-Report.pdf');
   }
 
   private fetchData() {
     forkJoin({
-      stats: this.inventoryService.getDashboardStats().pipe(catchError((err) => {
-        console.error('Stats failed:', err);
-        return of(null);
-      })),
-      alerts: this.inventoryService.getOpenAlerts().pipe(catchError((err) => {
-        console.error('Alerts failed:', err);
-        return of([]);
-      })),
-      entries: this.inventoryService.getEntriesProgress().pipe(catchError((err) => {
-        console.error('Entries failed:', err);
-        return of([]);
-      })),
-      exits: this.inventoryService.getExitProgress().pipe(catchError((err) => {
-        console.error('Exits failed:', err);
-        return of([]);
-      })),
-      articles: this.inventoryService.getAllArticles().pipe(catchError((err) => {
-        console.error('Articles failed:', err);
-        return of([]);
-      }))
-    }).subscribe({
-      next: (result) => {
-        this.stats.set(result.stats);
-        this.alerts.set(result.alerts);
-        this.articles.set(result.articles);
-        this.processChartData(result.entries, result.exits);
-        this.processArticleCharts(result.articles);
-        this.animateEntrance();
-      },
-      error: () => {
-        this.animateEntrance();
-      }
+      stats:    this.inventoryService.getDashboardStats().pipe(catchError(() => of(null))),
+      alerts:   this.inventoryService.getOpenAlerts().pipe(catchError(() => of([]))),
+      entries:  this.inventoryService.getEntriesProgress().pipe(catchError(() => of([]))),
+      exits:    this.inventoryService.getExitProgress().pipe(catchError(() => of([]))),
+      articles: this.inventoryService.getAllArticles().pipe(catchError(() => of([])))
+    }).subscribe(result => {
+      this.stats.set(result.stats);
+      this.alerts.set(result.alerts);
+      this.articles.set(result.articles);
+      this.buildLineChart(result.entries, result.exits);
+      this.buildArticleCharts(result.articles);
+      this.cd.detectChanges();
+      this.animateEntrance();
     });
   }
 
   private animateEntrance() {
-    // Ensure CD has run so elements are in DOM
-    this.cd.detectChanges();
-    
-    // Use a slightly longer delay to ensure DOM is ready
     setTimeout(() => {
-      const items = document.querySelectorAll('.animate-item');
-      if (items.length) {
-        // Kill existing animations on these items to avoid conflicts
-        gsap.killTweensOf(items);
-        
-        gsap.to(items, {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.05,
-          ease: 'power4.out',
-          overwrite: true
-        });
-      }
-    }, 100);
+      const items = document.querySelectorAll('.di');
+      if (items.length) gsap.to(items, { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power3.out' });
+    }, 50);
   }
 
-  private processChartData(entries: any[], exits: any[]) {
-    // Extract unique months for labels and sort them
-    const monthOrder = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-    const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    const allRawMonths = Array.from(new Set([
-      ...entries.map(e => e.month),
-      ...exits.map(e => e.month)
-    ]));
+  private buildLineChart(entries: any[], exits: any[]) {
+    // Debug: log what we actually receive from the API
+    console.log('[Dashboard] entries from API:', entries);
+    console.log('[Dashboard] exits from API:', exits);
 
-    let labels: string[] = [];
-    if (allRawMonths.length > 0) {
-      labels = allRawMonths.sort((a, b) => {
-        const idxA = monthOrder.indexOf(a.toUpperCase());
-        const idxB = monthOrder.indexOf(b.toUpperCase());
-        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-        return a.localeCompare(b);
-      });
-    } else {
-      labels = shortMonths.slice(0, 6);
-    }
+    // MySQL DATE_FORMAT returns YYYY-MM — collect all unique months
+    // Handle both 'month' and 'totalQuantity' key casing from different MySQL drivers
+    const getMonth = (e: any) => String(e.month ?? e.MONTH ?? '').trim();
+    const getQty   = (e: any) => Number(e.totalQuantity ?? e.totalquantity ?? e.TOTALQUANTITY ?? 0);
 
-    const getVal = (arr: any[], m: string) => 
-      arr.find(x => x.month.toUpperCase() === m.toUpperCase())?.totalQuantity || 0;
+    const rawMonths = Array.from(new Set([
+      ...entries.map(getMonth).filter(Boolean),
+      ...exits.map(getMonth).filter(Boolean)
+    ])).sort();
+
+    // Fallback: last 6 months with zero values so chart is never empty
+    const fallback = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - (5 - i));
+      return d.toISOString().slice(0, 7);
+    });
+
+    const months = rawMonths.length >= 1 ? rawMonths : fallback;
+
+    const labels = months.map(m => {
+      const [y, mo] = m.split('-');
+      return new Date(+y, +mo - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    });
+
+    const getVal = (arr: any[], raw: string) => {
+      const found = arr.find(x => getMonth(x) === raw);
+      return found ? getQty(found) : 0;
+    };
 
     this.lineChartData.set({
-      labels: labels,
+      labels,
       datasets: [
-        {
-          label: 'Stock Entries',
-          data: labels.map(m => getVal(entries, m)),
-          fill: true,
-          borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.05)',
-          tension: 0.4,
-          pointBackgroundColor: '#4f46e5'
-        },
-        {
-          label: 'Stock Exits',
-          data: labels.map(m => getVal(exits, m)),
-          fill: true,
-          borderColor: '#059669',
-          backgroundColor: 'rgba(5, 150, 105, 0.05)',
-          tension: 0.4,
-          pointBackgroundColor: '#059669'
-        }
+        { label: 'Inbound',  data: months.map(m => getVal(entries, m)), fill: true, borderColor: '#0a0a0a', backgroundColor: 'rgba(10,10,10,0.04)', pointBackgroundColor: '#0a0a0a', pointBorderColor: '#fff' },
+        { label: 'Outbound', data: months.map(m => getVal(exits, m)),   fill: true, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.05)', pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff' }
       ]
     });
   }
 
-  private processArticleCharts(articles: Article[]) {
-    // 1. Category Distribution
+  private buildArticleCharts(articles: Article[]) {
     const catMap = new Map<string, number>();
-    articles.forEach(art => {
-      const catName = art.category?.name || 'Uncategorized';
-      catMap.set(catName, (catMap.get(catName) || 0) + 1);
-    });
+    articles.forEach(a => { const n = a.category?.name || 'Other'; catMap.set(n, (catMap.get(n) || 0) + 1); });
 
     this.doughnutChartData.set({
-      labels: Array.from(catMap.keys()),
-      datasets: [{
-        data: Array.from(catMap.values()),
-        backgroundColor: [
-          '#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
-        ]
-      }]
+      labels: [...catMap.keys()],
+      datasets: [{ data: [...catMap.values()], backgroundColor: ['#0a0a0a', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'], borderWidth: 3, borderColor: '#fff', hoverOffset: 0 }]
     });
 
-    // 2. Top Articles by Quantity
-    const topArticles = [...articles]
-      .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 5);
-
+    const top = [...articles].sort((a, b) => b.quantity - a.quantity).slice(0, 6);
     this.barChartData.set({
-      labels: topArticles.map(a => a.name),
-      datasets: [{
-        label: 'Stock Quantity',
-        data: topArticles.map(a => a.quantity),
-        backgroundColor: '#4f46e5',
-        borderRadius: 8
-      }]
+      labels: top.map(a => a.name.length > 20 ? a.name.slice(0, 18) + '…' : a.name),
+      datasets: [{ label: 'Units', data: top.map(a => a.quantity), backgroundColor: top.map(a => a.quantity === 0 ? '#fca5a5' : a.quantity <= 10 ? '#fcd34d' : '#0a0a0a'), borderRadius: 5, borderSkipped: false }]
     });
   }
 }
